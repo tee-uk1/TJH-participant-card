@@ -414,7 +414,7 @@ function drawSquare(d, t, W, H) {
 
   // Background "iteration" loops, partly off-canvas, behind everything
   drawLoopArrow(-30, 600, 300, -0.42 * Math.PI, 0.38 * Math.PI, 54, t.loop, t.loopAlpha);
-  drawLoopArrow(W + 40, 540, 280, 0.58 * Math.PI, 1.38 * Math.PI, 54, t.loop, t.loopAlpha); // arrowhead sits below the logo band
+  drawLoopArrow(W - 10, 540, 280, 0.58 * Math.PI, 1.38 * Math.PI, 54, t.loop, t.loopAlpha); // arrowhead below the logo band and inside the right edge
 
   drawBand(t, W, 150, 118, cx, 'center');
 
@@ -446,7 +446,7 @@ function drawLandscape(d, t, W, H) {
   ctx.fillStyle = t.bg;
   ctx.fillRect(0, 0, W, H);
 
-  drawLoopArrow(W + 30, 370, 230, 0.58 * Math.PI, 1.4 * Math.PI, 42, t.loop, t.loopAlpha); // arrowhead sits below the logo band
+  drawLoopArrow(W - 20, 370, 230, 0.58 * Math.PI, 1.4 * Math.PI, 42, t.loop, t.loopAlpha); // arrowhead below the logo band and inside the right edge
 
   drawBand(t, W, 96, 76, 40, 'left');
   // Headline in the band, right side
