@@ -490,7 +490,7 @@ function render() {
   $('alt-text').value = buildAltText(d);
   $('photo-nudge').hidden = !!state.photo;
   $('drag-hint').hidden = !state.photo;
-  $('move-bar').hidden = !state.photo;
+  $('move-photo').hidden = !state.photo;
   const ready = !!$('fullName').value.trim();
   $('download').disabled = !ready;
   $('copy-image').disabled = !ready;
@@ -614,6 +614,10 @@ $('photo').addEventListener('change', async (e) => {
     $('zoom').value = 1;
     $('photo-controls').hidden = false;
     setMoving(false);
+    // Pulse the Move photo button a few times so people notice it
+    const fab = $('move-photo');
+    fab.classList.remove('pulse');
+    requestAnimationFrame(() => requestAnimationFrame(() => fab.classList.add('pulse')));
   } catch {
     alert('Sorry, that image could not be read. Please try a JPG or PNG.');
   }
@@ -716,15 +720,22 @@ const toCanvas = (e) => {
 /** Switch "Move photo" mode on or off. Off keeps normal page scrolling on phones. */
 function setMoving(on) {
   state.moving = on && !!state.photo;
-  const btn = $('move-photo');
-  btn.textContent = state.moving ? '✓ Done' : '✥ Move photo';
-  btn.setAttribute('aria-pressed', String(state.moving));
+  ['move-photo', 'move-photo-form'].forEach((id) => {
+    const btn = $(id);
+    btn.textContent = state.moving ? '✓ Done' : '✥ Move photo';
+    btn.setAttribute('aria-pressed', String(state.moving));
+  });
   $('move-hint').hidden = !state.moving;
   canvas.classList.toggle('moving', state.moving);
   $('canvas-wrap').classList.toggle('moving', state.moving);
   if (!state.moving) endDrag();
 }
 $('move-photo').addEventListener('click', () => setMoving(!state.moving));
+// The form's button also brings the card into view (on phones it's further down the page)
+$('move-photo-form').addEventListener('click', () => {
+  setMoving(!state.moving);
+  if (state.moving) $('canvas-wrap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
 
 canvas.addEventListener('pointerdown', (e) => {
   if (!state.moving || !state.photo || !state.avatar) return;

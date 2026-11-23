@@ -188,6 +188,7 @@ input[type="file"] { font-size: 14px; }
 
 /* ---------- preview ---------- */
 .canvas-wrap {
+  position: relative;
   background: var(--bg-alt);
   border-radius: 12px;
   padding: 20px;
@@ -230,12 +231,37 @@ canvas {
 .nudge[hidden] { display: none; }
 .nudge a { color: var(--lapis); font-weight: 700; }
 /* Move-photo mode: dragging only works (and page scrolling over the card
-   is only paused) while it's switched on */
-.move-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; margin-top: 14px; }
-.move-bar[hidden], .move-hint[hidden] { display: none; }
-.btn.small { font-size: 16px; padding: 8px 18px; background: var(--field); color: var(--lapis); box-shadow: inset 0 0 0 2px var(--lapis); }
-.btn.small[aria-pressed="true"] { background: var(--lapis); color: var(--on-saffron); }
-.move-hint { font-size: 14px; color: var(--lapis-dark); }
+   is only paused) while it's switched on. The bright Sunglow button sits on
+   the card's top-right corner, with a matching one next to the photo field. */
+.move-fab {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  z-index: 2;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #ffcc33;            /* Sunglow */
+  color: var(--lapis-dark);
+  box-shadow: 0 6px 16px rgba(31, 31, 94, 0.28);
+  cursor: pointer;
+}
+.move-fab:hover { background: #ffd147; }   /* Sunglow tint */
+.move-fab[aria-pressed="true"] { background: var(--lapis); color: var(--on-saffron); }
+.move-fab[hidden], .move-hint[hidden], .drag-hint[hidden] { display: none; }
+.move-fab.inline { position: static; box-shadow: none; }
+.move-fab.pulse { animation: move-pulse 1.2s ease-in-out 3; }
+@keyframes move-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(255, 204, 51, 0.45); }
+}
+@media (prefers-reduced-motion: reduce) { .move-fab.pulse { animation: none; } }
+.drag-hint { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.drag-hint .hint { margin: 0; }
+.move-hint { text-align: center; font-size: 15px; font-weight: 700; color: var(--lapis-dark); margin: 12px 0 0; }
 .canvas-wrap.moving { outline: 3px dashed var(--saffron); outline-offset: -3px; }
 canvas.moving { cursor: grab; touch-action: none; }
 canvas.dragging { cursor: grabbing; }
@@ -274,6 +300,7 @@ canvas.dragging { cursor: grabbing; }
   .layout { padding: 16px 12px 40px; gap: 16px; }
   .panel { padding: 16px; }
   .canvas-wrap { padding: 10px; }
+  .move-fab:not(.inline) { top: 12px; right: 12px; font-size: 13px; padding: 7px 11px; } /* compact, clear of the logo */
   canvas { max-height: none; }
   .actions .btn { flex: 1 1 100%; }
   /* 16px+ stops iOS Safari zooming in when a field is tapped */
