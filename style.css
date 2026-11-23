@@ -1,0 +1,168 @@
+/* General Job Hackers styling: white page, Lapis headings, Lapis-outlined
+   cards and Deep Saffron pill buttons, set in Lato.
+   Every color comes from the brand tonal maps (Lapis, Saffron, Sunglow, Green). */
+:root {
+  --bg: #ffffff;
+  --bg-alt: #f6f6fc;
+  --panel: #ffffff;
+  --text: #4b4b81;
+  --muted: #62626a;
+  --border: #d9d9f2;
+  --lapis: #333399;
+  --lapis-dark: #1f1f5e;
+  --saffron: #ff9933;
+  --saffron-dark: #f77c00;
+  --radius: 16px;
+  font-family: "Lato", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* ---------- top bar (like the site nav) ---------- */
+.topbar { border-bottom: 1px solid var(--border); background: #fff; }
+.topbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand { height: 60px; width: auto; display: block; }
+
+/* ---------- page header ---------- */
+.site-header {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 8px;
+  text-align: center;
+}
+.site-header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--lapis);
+  line-height: 1.25;
+}
+.lede { margin: 0 auto; color: var(--text); max-width: 680px; font-size: 18px; }
+
+/* ---------- layout ---------- */
+.layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 56px;
+  display: grid;
+  grid-template-columns: minmax(300px, 420px) 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--lapis);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+/* ---------- form ---------- */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+label, .label { font-weight: 700; font-size: 15px; color: var(--lapis); }
+.req { color: var(--saffron-dark); }
+.opt, .counter { font-weight: 400; color: var(--muted); }
+.counter { float: right; font-size: 12px; }
+
+input[type="text"], textarea, select {
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--lapis-dark);
+  width: 100%;
+}
+textarea { resize: vertical; }
+input[type="text"]:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--lapis);
+  outline-offset: 1px;
+  border-color: transparent;
+}
+input[type="file"] { font-size: 14px; }
+
+.photo-controls { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+.photo-controls[hidden] { display: none; }
+.photo-controls label { font-weight: 400; color: var(--text); }
+.photo-controls input[type="range"] { flex: 1; accent-color: var(--lapis); }
+
+.seg { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+.seg label { font-weight: 400; color: var(--text); display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.seg input { accent-color: var(--lapis); }
+
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.swatch {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 0 0 1px var(--border);
+}
+.swatch[aria-checked="true"] { border-color: var(--lapis); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--lapis); }
+
+/* ---------- preview ---------- */
+.canvas-wrap {
+  background: var(--bg-alt);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+}
+canvas {
+  max-width: 100%;
+  max-height: 70vh;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(31, 31, 94, 0.18);
+}
+
+.actions { display: flex; justify-content: center; gap: 12px; margin: 22px 0 8px; }
+.btn {
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 28px;
+  cursor: pointer;
+}
+.btn.primary { background: var(--saffron); color: #fff; }
+.btn.primary:hover { background: var(--saffron-dark); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.link-btn {
+  font: inherit;
+  font-size: 14px;
+  background: none;
+  border: 0;
+  color: var(--lapis);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.post { margin-top: 16px; }
+.post-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.hint { font-size: 14px; color: var(--muted); margin: 6px 0 8px; }
+.post-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+.bracket-status { font-size: 14px; font-weight: 700; color: #a95400; } /* darkest readable Saffron tint */
+.bracket-status.done { color: var(--lapis); }

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agile MBA – Participant Card | The Job Hackers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="topbar">
+    <div class="topbar-inner">
+      <a href="https://www.thejobhackers.org/" aria-label="The Job Hackers home">
+        <img class="brand" src="assets/logo-lapis.png" alt="The Job Hackers" />
+      </a>
+    </div>
+  </nav>
+
+  <header class="site-header">
+    <h1>Share that you're taking part in the Agile MBA&trade;</h1>
+    <p class="lede">Fill in your details, download your card, and share it on LinkedIn. Everything stays in your browser. Nothing is uploaded.</p>
+  </header>
+
+  <main class="layout">
+    <form id="card-form" class="panel" autocomplete="on" novalidate>
+      <div class="field">
+        <label for="fullName">Full name <span class="req">*</span></label>
+        <input id="fullName" name="fullName" type="text" maxlength="40" placeholder="Alex Morgan" required />
+      </div>
+
+      <div class="field">
+        <label for="role">Role</label>
+        <input id="role" name="role" type="text" maxlength="50" placeholder="Product Manager" />
+      </div>
+
+      <div class="field">
+        <label for="company">Organization <span class="opt">(optional)</span></label>
+        <input id="company" name="company" type="text" maxlength="40" placeholder="Acme Inc." />
+      </div>
+
+      <div class="field">
+        <label for="country">Country <span class="opt">(optional)</span></label>
+        <input id="country" name="country" type="text" maxlength="40" list="country-list" placeholder="Start typing your country" autocomplete="country-name" />
+        <datalist id="country-list"></datalist>
+      </div>
+
+      <div class="field">
+        <label for="cohort">Cohort</label>
+        <select id="cohort" name="cohort"></select>
+      </div>
+
+      <div class="field">
+        <label for="focus">Skill improvement focus <span class="opt">(optional)</span></label>
+        <select id="focus" name="focus"></select>
+      </div>
+
+      <div class="field">
+        <label for="goal">What are you looking forward to? <span class="counter" id="goal-counter">0/160</span></label>
+        <textarea id="goal" name="goal" rows="3" maxlength="160" placeholder="Leading teams with more agility and building products customers love."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="photo">Your photo <span class="opt">(optional)</span></label>
+        <input id="photo" name="photo" type="file" accept="image/*" />
+        <div class="photo-controls" id="photo-controls" hidden>
+          <label for="zoom">Zoom</label>
+          <input id="zoom" type="range" min="1" max="3" step="0.01" value="1" />
+          <button type="button" id="remove-photo" class="link-btn">Remove</button>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <span class="label">Format</span>
+          <div class="seg" role="radiogroup">
+            <label><input type="radio" name="format" value="square" checked /> Square</label>
+            <label><input type="radio" name="format" value="landscape" /> Landscape</label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">Theme</span>
+          <div class="swatches" id="swatches" role="radiogroup"></div>
+        </div>
+      </div>
+    </form>
+
+    <section class="panel preview-panel">
+      <div class="canvas-wrap">
+        <canvas id="card" width="1080" height="1080" aria-label="Preview of your participant card"></canvas>
+      </div>
+      <div class="actions">
+        <button type="button" id="download" class="btn primary">Download image</button>
+      </div>
+
+      <div class="post">
+        <div class="post-head">
+          <span class="label">Suggested LinkedIn post</span>
+          <button type="button" id="copy-post" class="link-btn">Copy text</button>
+        </div>
+        <p class="hint">This is a starting point, not a finished post. Replace each <strong>[bracketed]</strong> part in your own words so your post sounds like you.</p>
+        <textarea id="post-text" rows="16"></textarea>
+        <div class="post-foot">
+          <span id="bracket-status" class="bracket-status"></span>
+          <button type="button" id="new-opener" class="link-btn">Try a different opening line</button>
+        </div>
+        <p class="hint">On LinkedIn, click <em>Start a post</em>, add your downloaded image, then paste your text.</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="cohorts.js"></script>
+  <script src="countries.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
