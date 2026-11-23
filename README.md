@@ -4,7 +4,7 @@ A small static web page where people who have enrolled in The Job Hackers' Agile
 
 - Everything runs in the browser. Nothing people type is uploaded or stored.
 - Square format (1080×1080) and landscape format (1200×627).
-- Photo upload with zoom and drag-to-reposition. If there's no photo, the card shows initials and the page suggests adding one.
+- Photo upload with zoom and drag-to-reposition. Without a photo, the preview shows "YOUR PHOTO HERE", the page suggests adding one, and the downloaded/copied/shared image uses The Job Hackers logo in the circle instead.
 - Download the card as a PNG, copy it to the clipboard and paste it straight into a LinkedIn post, or (on phones) send it to the LinkedIn app with the Share button.
 - Ready-to-paste image description (alt text) for screen-reader users.
 - Works on phones as well as desktop.

@@ -57,6 +57,7 @@ const state = {
   zoom: 1,
   offset: { x: 0, y: 0 }, // photo pan, as a fraction of the photo circle's diameter
   avatar: null,            // where the photo circle was last drawn {cx, cy, r}
+  exporting: false,        // true while drawing the image people download/copy/share
   logos: {},     // variant name -> HTMLImageElement
 };
 
@@ -120,14 +121,6 @@ function fitText(text, weight, size, minSize, maxWidth, maxLines) {
 function drawLines(lines, x, y, lineHeight) {
   lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
   return y + lines.length * lineHeight;
-}
-
-function initials(name) {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return '?';
-  const first = parts[0][0];
-  const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
-  return (first + last).toUpperCase();
 }
 
 function getData() {
@@ -245,12 +238,24 @@ function drawAvatar(t, name, cx, cy, r) {
   } else {
     ctx.fillStyle = t.avatarBg;
     ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
-    ctx.fillStyle = t.avatarText;
-    ctx.font = font(900, r * 0.78);
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(initials(name), cx, cy + r * 0.05);
-    ctx.textBaseline = 'alphabetic';
+    const logo = state.logos[t.logo];
+    if (state.exporting && logo) {
+      // No photo in the final image: use the theme's Job Hackers logo instead
+      const h = r * 1.22;
+      const w = (logo.width / logo.height) * h;
+      ctx.drawImage(logo, cx - w / 2, cy - h / 2, w, h);
+    } else {
+      // Preview only: show where the photo will go
+      ctx.fillStyle = t.avatarText;
+      ctx.font = font(900, r * 0.24);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      withLetterSpacing(r * 0.02, () => {
+        ctx.fillText('YOUR PHOTO', cx, cy - r * 0.15);
+        ctx.fillText('HERE', cx, cy + r * 0.17);
+      });
+      ctx.textBaseline = 'alphabetic';
+    }
   }
   ctx.restore();
 }
@@ -646,6 +651,21 @@ function countEvent(name) {
   try { window.goatcounter.count({ path: name, title: name, event: true }); } catch { /* never block the user */ }
 }
 
+/**
+ * The PNG people take away. It's drawn in "export" mode (the logo replaces
+ * the "YOUR PHOTO HERE" placeholder), then the preview is redrawn.
+ * toBlob copies the canvas as soon as it's called, so redrawing straight
+ * after is safe.
+ */
+function exportBlob() {
+  state.exporting = true;
+  render();
+  const blob = new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+  state.exporting = false;
+  render();
+  return blob;
+}
+
 const slugify = (str) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 $('download').addEventListener('click', () => {
@@ -653,13 +673,13 @@ $('download').addEventListener('click', () => {
   countEvent(`card-download/${slugify(d.cohort || 'no-cohort')}/${d.format}/${state.themeId}`);
   const name = $('fullName').value.trim() || 'participant';
   const slug = slugify(name);
-  canvas.toBlob((blob) => {
+  exportBlob().then((blob) => {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `agile-mba-${slug}.png`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  }, 'image/png');
+  });
 });
 
 function showCopyStatus(msg) {
@@ -679,7 +699,7 @@ $('copy-image').addEventListener('click', async () => {
   }
   try {
     // Passing a promise keeps Safari happy (the clipboard write must start during the click)
-    const blob = new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    const blob = exportBlob();
     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
     showCopyStatus('Card copied! Paste it into your LinkedIn post with Ctrl+V (or ⌘V on Mac).');
   } catch {
@@ -689,10 +709,10 @@ $('copy-image').addEventListener('click', async () => {
 
 /* ---------- share sheet (phones): send the card straight to the LinkedIn app ---------- */
 function cardFile() {
-  return new Promise((resolve) => canvas.toBlob((blob) => {
+  return exportBlob().then((blob) => {
     const slug = slugify($('fullName').value.trim() || 'participant');
-    resolve(new File([blob], `agile-mba-${slug}.png`, { type: 'image/png' }));
-  }, 'image/png'));
+    return new File([blob], `agile-mba-${slug}.png`, { type: 'image/png' });
+  });
 }
 
 (function setupShare() {
