@@ -10,7 +10,7 @@ It's a prototype that will be refined through the Kaizen process.
 
 - **Form:** full name (required), role, organization, country, cohort, skill improvement focus and an optional photo.
 - **Card:** drawn live as people type, in two themes (**Lavender** and **Lapis**) and two sizes (**square** 1080×1080 and **landscape** 1200×627).
-- **Photo:** zoom with a slider, and drag it on the card to reposition it (mouse or touch).
+- **Photo:** zoom with a slider. To reposition it, tap **Move photo** under the card, drag the photo (mouse or touch), then tap **Done**. Dragging only works in this mode, so the page scrolls normally on phones the rest of the time.
   - Without a photo, the preview shows "YOUR PHOTO HERE" and a tip suggests adding one.
   - The final image uses The Job Hackers logo in the photo circle instead.
 - **Getting the card out:**
@@ -75,7 +75,7 @@ Commit the change to `main` and the live site updates in about 2 minutes.
 | `config.js` | Wording, links, focus list, post text, hashtags, cohort rules | Anyone |
 | `index.html` | The page and form | Developers |
 | `style.css` | Page styling, including the phone layout | Developers |
-| `app.js` | Card themes and drawing, the post and alt text, download/copy/share, photo dragging | Developers |
+| `app.js` | Card themes and drawing, the post and alt text, download/copy/share, Move photo mode | Developers |
 | `cohorts.js` | Works out the quarters in the cohort dropdown | Developers |
 | `countries.js` | Country suggestions for the Country field | Rarely |
 | `assets/` | The Lapis and white Job Hackers logos | Rarely |
@@ -96,8 +96,8 @@ The site is plain HTML, CSS and JavaScript with no build step. It's hosted on Gi
 
 ## Known limits
 
-- **Share and Copy image on phones:** tested in desktop browsers and a simulated phone, but not yet on a real iPhone or Android device.
-- **Scrolling on phones:** once a photo is added, swiping on the card doesn't scroll the page, so that dragging the photo works. People can scroll from the space around the card.
+- **Copy image** has been tested in a desktop browser, but not yet on a real phone.
+- **Share…** hasn't been tested at all yet: the button only appears in browsers that can share files (mainly phones), and none was available during development. It needs a first test on a real iPhone and Android phone.
 
 ## Handing over to The Job Hackers
 

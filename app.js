@@ -58,6 +58,7 @@ const state = {
   offset: { x: 0, y: 0 }, // photo pan, as a fraction of the photo circle's diameter
   avatar: null,            // where the photo circle was last drawn {cx, cy, r}
   exporting: false,        // true while drawing the image people download/copy/share
+  moving: false,           // "Move photo" mode: dragging on, page scroll over the card paused
   logos: {},     // variant name -> HTMLImageElement
 };
 
@@ -488,8 +489,8 @@ function render() {
   updatePost(d);
   $('alt-text').value = buildAltText(d);
   $('photo-nudge').hidden = !!state.photo;
-  canvas.classList.toggle('has-photo', !!state.photo);
   $('drag-hint').hidden = !state.photo;
+  $('move-bar').hidden = !state.photo;
   const ready = !!$('fullName').value.trim();
   $('download').disabled = !ready;
   $('copy-image').disabled = !ready;
@@ -612,6 +613,7 @@ $('photo').addEventListener('change', async (e) => {
     state.offset = { x: 0, y: 0 };
     $('zoom').value = 1;
     $('photo-controls').hidden = false;
+    setMoving(false);
   } catch {
     alert('Sorry, that image could not be read. Please try a JPG or PNG.');
   }
@@ -625,6 +627,7 @@ $('remove-photo').addEventListener('click', () => {
   state.offset = { x: 0, y: 0 };
   $('photo').value = '';
   $('photo-controls').hidden = true;
+  setMoving(false);
   render();
 });
 
@@ -710,8 +713,21 @@ const toCanvas = (e) => {
   const rect = canvas.getBoundingClientRect();
   return { x: (e.clientX - rect.left) * (canvas.width / rect.width), y: (e.clientY - rect.top) * (canvas.height / rect.height) };
 };
+/** Switch "Move photo" mode on or off. Off keeps normal page scrolling on phones. */
+function setMoving(on) {
+  state.moving = on && !!state.photo;
+  const btn = $('move-photo');
+  btn.textContent = state.moving ? '✓ Done' : '✥ Move photo';
+  btn.setAttribute('aria-pressed', String(state.moving));
+  $('move-hint').hidden = !state.moving;
+  canvas.classList.toggle('moving', state.moving);
+  $('canvas-wrap').classList.toggle('moving', state.moving);
+  if (!state.moving) endDrag();
+}
+$('move-photo').addEventListener('click', () => setMoving(!state.moving));
+
 canvas.addEventListener('pointerdown', (e) => {
-  if (!state.photo || !state.avatar) return;
+  if (!state.moving || !state.photo || !state.avatar) return;
   const p = toCanvas(e);
   const { cx, cy, r } = state.avatar;
   if (Math.hypot(p.x - cx, p.y - cy) > r * 1.4) return; // only grab near the photo
@@ -729,7 +745,7 @@ canvas.addEventListener('pointermove', (e) => {
   drag = p;
   render();
 });
-const endDrag = () => { drag = null; canvas.classList.remove('dragging'); };
+function endDrag() { drag = null; canvas.classList.remove('dragging'); }
 canvas.addEventListener('pointerup', endDrag);
 canvas.addEventListener('pointercancel', endDrag);
 
