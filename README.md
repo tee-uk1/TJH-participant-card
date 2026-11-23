@@ -21,7 +21,7 @@ Then open http://localhost:5173.
 Edit the `CONFIG` block at the top of `app.js`:
 
 - `logos`: logo variants in `assets/`. Each theme chooses `white` (dark backgrounds) or `lapis` (light backgrounds).
-- `themes`: two card themes built from the brand palette. **Saffron** (default) has a soft Saffron background, a light top band with the Lapis logo, and Lapis text. **Lapis** is the dark version with the white logo and Saffron highlights. Both use the same "iteration loop" arrows as a background motif, a loop around the photo, and a forward-pointing ribbon for the cohort and hashtags.
+- `themes`: two card themes built from the brand palette. **Lavender** (default) has a soft Lapis-tint background (`#CACAED`), a light top band with the Lapis logo, and Lapis text. **Lapis** is the dark version with the white logo and Saffron highlights. Both use the same "iteration loop" arrows as a background motif, a loop around the photo, and a forward-pointing ribbon for the cohort and hashtags.
 - `headingFont` / `bodyFont`: Lato (the primary brand font). Poppins is loaded too if you want to switch the headings to it.
 - `cardHashtags`: hashtags on the image (`#AgileMBA #AlwaysAJobHacker`). `hashtags`: hashtags in the post.
 - `courseUrl`: course page linked at the end of the post.
@@ -54,7 +54,7 @@ The tool can count how often it's used, without collecting anything people type.
 
 It counts:
 - page visits (automatic)
-- `card-download/<cohort>/<format>/<theme>`, e.g. `card-download/q4-2026/square/saffron`
+- `card-download/<cohort>/<format>/<theme>`, e.g. `card-download/q4-2026/square/lavender`
 - `card-copied/<cohort>/<format>/<theme>` (when the image is copied instead of downloaded)
 - `post-copied`
 

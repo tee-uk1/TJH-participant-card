@@ -38,15 +38,16 @@ const CONFIG = {
   bodyFont: 'Lato',
   // Card themes. Every color is from the brand tonal maps: Lapis Lazuli
   // #333399, Deep Saffron #FF9933, Mute Green #99CC99 and their tints.
+  // Lavender is the Lapis tint #CACAED.
   // The first theme is the default.
   themes: [
     {
-      id: 'saffron', name: 'Saffron', swatch: ['#FFC081', '#333399'],
-      bg: '#FFC081', band: '#FFFBF7', ring: '#FF9933', halo: '#FFFBF7',
+      id: 'lavender', name: 'Lavender', swatch: ['#CACAED', '#FF9933'],
+      bg: '#CACAED', band: '#FFFBF7', ring: '#FF9933', halo: '#FFFBF7',
       loop: '#FFFBF7', loopAlpha: 0.8,
       text: '#333399', muted: '#1F1F5E',
-      avatarBg: '#FFE7D0', avatarText: '#333399',
-      chipBg: '#333399', chipLabel: '#FFC081', chipText: '#FFFBF7',
+      avatarBg: '#F6F6FC', avatarText: '#333399',
+      chipBg: '#333399', chipLabel: '#FFB66E', chipText: '#FFFBF7',
       ribbon: '#FFFBF7', ribbonAlpha: 0.95, cohort: '#438543', tags: '#333399',
       logo: 'lapis',
     },

@@ -3,7 +3,7 @@
    Every color comes from the brand tonal maps (Lapis, Saffron, Sunglow, Green). */
 :root {
   --bg: #f6f6fc;        /* lightest Lapis tint */
-  --bg-alt: #d9d9f2;    /* Lapis tint */
+  --bg-alt: #f6f6fc;    /* lightest Lapis tint (behind the card preview) */
   --hero: #d9d9f2;      /* Lapis tint */
   --panel: #fffbf7;     /* lightest Saffron tint */
   --field: #f6f6fc;
