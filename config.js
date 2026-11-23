@@ -81,9 +81,4 @@ const SETTINGS = {
     pastQuarters: 1,      // how many past quarters stay selectable
     totalOptions: 4,      // how many quarters the dropdown shows
   },
-
-  /* ---------- Usage counting (optional) ----------
-   * Your GoatCounter site code, e.g. 'tjh-agile-card'. Leave empty ('')
-   * to turn counting off. See README for setup. */
-  goatcounterCode: '',
 };

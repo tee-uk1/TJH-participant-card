@@ -635,23 +635,6 @@ $('remove-photo').addEventListener('click', () => {
   render();
 });
 
-/* ---------- usage counting ----------
- * Sends anonymous counts only (no names, roles or other form data).
- * Does nothing until CONFIG.goatcounterCode is set. */
-function loadCounter() {
-  if (!CONFIG.goatcounterCode) return;
-  const sc = document.createElement('script');
-  sc.async = true;
-  sc.src = 'https://gc.zgo.at/count.js';
-  sc.dataset.goatcounter = `https://${CONFIG.goatcounterCode}.goatcounter.com/count`;
-  document.head.appendChild(sc);
-}
-
-function countEvent(name) {
-  if (!CONFIG.goatcounterCode || !window.goatcounter || !window.goatcounter.count) return;
-  try { window.goatcounter.count({ path: name, title: name, event: true }); } catch { /* never block the user */ }
-}
-
 /**
  * The PNG people take away. It's drawn in "export" mode (the logo replaces
  * the "YOUR PHOTO HERE" placeholder), then the preview is redrawn.
@@ -671,7 +654,6 @@ const slugify = (str) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/
 
 $('download').addEventListener('click', () => {
   const d = getData();
-  countEvent(`card-download/${slugify(d.cohort || 'no-cohort')}/${d.format}/${state.themeId}`);
   const name = $('fullName').value.trim() || 'participant';
   const slug = slugify(name);
   exportBlob().then((blob) => {
@@ -693,7 +675,6 @@ function showCopyStatus(msg) {
 // Copy the card straight to the clipboard so it can be pasted into a LinkedIn post.
 $('copy-image').addEventListener('click', async () => {
   const d = getData();
-  countEvent(`card-copied/${slugify(d.cohort || 'no-cohort')}/${d.format}/${state.themeId}`);
   if (!navigator.clipboard || !window.ClipboardItem) {
     showCopyStatus("Your browser can't copy images. Please use Download PNG instead.");
     return;
@@ -726,7 +707,6 @@ function cardFile() {
 
 $('share-image').addEventListener('click', async () => {
   const d = getData();
-  countEvent(`card-shared/${slugify(d.cohort || 'no-cohort')}/${d.format}/${state.themeId}`);
   try {
     await navigator.share({ files: [await cardFile()] });
   } catch (err) {
@@ -788,7 +768,6 @@ $('copy-alt').addEventListener('click', async () => {
 
 $('copy-post').addEventListener('click', async () => {
   const btn = $('copy-post');
-  countEvent('post-copied');
   try {
     await navigator.clipboard.writeText($('post-text').value);
     btn.textContent = 'Copied!';
@@ -803,7 +782,6 @@ $('copy-post').addEventListener('click', async () => {
 (async function init() {
   buildSwatches();
   buildFormOptions();
-  loadCounter();
   await Promise.all(Object.entries(CONFIG.logos).map(async ([key, src]) => {
     try { state.logos[key] = await loadImage(src); } catch { /* fall back to wordmark */ }
   }));

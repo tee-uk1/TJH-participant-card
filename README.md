@@ -16,7 +16,7 @@ A small static web page where people who have enrolled in The Job Hackers' Agile
 
 | File | What it is | Who edits it |
 |---|---|---|
-| `config.js` | Wording, links, focus list, post text, hashtags, cohort rules, usage counting | Anyone |
+| `config.js` | Wording, links, focus list, post text, hashtags, cohort rules | Anyone |
 | `index.html` | The page and form | Developers |
 | `style.css` | Page styling | Developers |
 | `app.js` | Draws the card, builds the post and alt text, handles download/copy/share and photo dragging | Developers |
@@ -41,7 +41,6 @@ Everything non-technical lives in **`config.js`**, with instructions at the top 
 - the skill-focus list (`focusOptions`)
 - the suggested LinkedIn post (`postOpeners`, `postParagraphs`, `postHashtags`)
 - cohort dropdown rules (`cohorts`)
-- usage counting (`goatcounterCode`)
 
 Commit the change to `main` and the live site updates in about 2 minutes.
 
@@ -73,19 +72,6 @@ Edit the `CONFIG` block at the top of `app.js`:
 
 The post is a skeleton, not a finished post. It fills in the cohort and focus, and leaves `[bracketed]` prompts for people to answer in their own words. The opening line varies, so posts from the same cohort don't read like copies. A counter shows how many brackets are still left. It includes a prompt to tag The Job Hackers' LinkedIn page. Edit the wording in `config.js`.
 
-## Usage counting
-
-The tool can count how often it's used, without collecting anything people type. It uses [GoatCounter](https://www.goatcounter.com/): free for nonprofits, no cookies, no consent banner needed, and it works on any host.
-
-It counts:
-- page visits (automatic)
-- `card-download/<cohort>/<format>/<theme>`, e.g. `card-download/q4-2026/square/lavender`
-- `card-copied/<cohort>/<format>/<theme>` (when the image is copied instead of downloaded)
-- `card-shared/<cohort>/<format>/<theme>` (when shared from a phone)
-- `post-copied`
-
-To turn it on, sign up at goatcounter.com, pick a site code (e.g. `tjh-agile-card`), and set `goatcounterCode: 'tjh-agile-card'` in `config.js`. While the code is empty, nothing is sent anywhere.
-
 ## Deploy
 
 The site is plain HTML, CSS and JS with no build step. It's hosted on GitHub Pages from the `main` branch: every push to `main` redeploys it within a couple of minutes. It will also work on Netlify, Cloudflare Pages or any static host.
@@ -96,7 +82,6 @@ When the repository is transferred to a Job Hackers GitHub account:
 
 - The live address changes to `https://<new-owner>.github.io/TJH-participant-card/`, or to a custom domain if one is set up (e.g. `card.thejobhackers.org`). GitHub redirects the old repo URL, but **not** the old GitHub Pages address, so update any links you've shared.
 - Check GitHub Pages is still switched on (Settings → Pages → deploy from `main`, folder `/`).
-- If usage counting is wanted, create the GoatCounter account under The Job Hackers and add its code to `config.js`.
 
 ## License and credits
 
