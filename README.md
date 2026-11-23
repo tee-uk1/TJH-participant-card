@@ -29,10 +29,9 @@ Edit the `CONFIG` block at the top of `app.js`:
 
 ## Form fields
 
-- **Full name** (required), **Role**, **Organization** (optional) and **Country** (optional, with autocomplete).
+- **Full name** (required), **Role**, **Organization** (optional) and **Country** (optional, with autocomplete; shown under the name with a location pin).
 - **Cohort**: a dropdown of quarters that updates itself (see below).
 - **Skill improvement focus** (optional): edit the list in `CONFIG.focusOptions` in `app.js`.
-- **What are you looking forward to?**: shown as a quote on the card.
 
 ## Rolling cohort list
 
@@ -46,7 +45,7 @@ Edit the `CONFIG` block at the top of `app.js`:
 
 ## Suggested LinkedIn post
 
-The post is a skeleton, not a finished post. It fills in the cohort, focus and goal, and leaves `[bracketed]` prompts for people to answer in their own words. The opening line varies, so posts from the same cohort don't read like copies. A counter shows how many brackets are still left. Edit the wording in `OPENERS` and `buildPost()` in `app.js`.
+The post is a skeleton, not a finished post. It fills in the cohort and focus, and leaves `[bracketed]` prompts for people to answer in their own words. The opening line varies, so posts from the same cohort don't read like copies. A counter shows how many brackets are still left. Edit the wording in `OPENERS` and `buildPost()` in `app.js`.
 
 ## Usage counting
 

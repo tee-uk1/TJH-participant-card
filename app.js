@@ -160,7 +160,6 @@ function getData() {
     country: v('country'),
     cohort: v('cohort'),          // e.g. "Q4 2026"
     focus: v('focus'),
-    goal: v('goal'),
     format: document.querySelector('input[name="format"]:checked').value,
   };
 }
@@ -309,48 +308,87 @@ function roleLine(d) {
 }
 
 function cohortLine(d) {
-  return [d.cohort && `${d.cohort} Cohort`, d.country].filter(Boolean).join('  ·  ').toUpperCase();
+  return d.cohort ? `${d.cohort} Cohort`.toUpperCase() : '';
+}
+
+/** Small location pin whose tip sits at (x, baseY). */
+function drawPin(x, baseY, h, color, holeColor) {
+  const r = h * 0.36;
+  const cy = baseY - h + r;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, cy, r, 0.78 * Math.PI, 2.22 * Math.PI);
+  ctx.lineTo(x, baseY);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = holeColor;
+  ctx.beginPath();
+  ctx.arc(x, cy, r * 0.42, 0, Math.PI * 2);
+  ctx.fill();
 }
 
 /**
- * Stack the name, role, focus and quote centered on cx, starting at `top`.
+ * Name, then country (with a pin), then role · organization, then the focus
+ * chip, all centered on cx from `top`. With `dry` set it only measures.
  * `sc` scales every size so the same code serves both formats.
+ * Returns the y of the bottom of the block.
  */
-function drawPersonBlock(d, t, cx, top, maxW, sc, maxBottom) {
+function drawPersonBlock(d, t, cx, top, maxW, sc, dry = false) {
   ctx.textAlign = 'center';
 
-  const nf = fitText(d.fullName.toUpperCase(), 900, 58 * sc, 34 * sc, maxW, 2);
-  ctx.fillStyle = t.text;
-  let base = top + nf.size * 0.92;
-  withLetterSpacing(1 * sc, () => {
-    nf.lines.forEach((l, i) => ctx.fillText(l, cx, base + i * nf.size * 1.08));
-  });
-  base += (nf.lines.length - 1) * nf.size * 1.08;
+  // Name: big and bold. Shrink to stay on one line; wrap to two only for very long names
+  const name = d.fullName.toUpperCase();
+  let nf = fitText(name, 900, 74 * sc, 46 * sc, maxW, 1);
+  ctx.font = font(900, nf.size);
+  if (wrap(name, maxW, 99).length > 1) nf = fitText(name, 900, 54 * sc, 36 * sc, maxW, 2);
+  const nameLH = nf.size * 1.04;
+  let base = top + nf.size * 0.9;
+  if (!dry) {
+    ctx.fillStyle = t.text;
+    withLetterSpacing(1 * sc, () => nf.lines.forEach((l, i) => ctx.fillText(l, cx, base + i * nameLH)));
+  }
+  base += (nf.lines.length - 1) * nameLH;
 
-  const role = roleLine(d);
-  if (role) {
-    const rf = fitText(role, 700, 30 * sc, 20 * sc, maxW, 1);
-    ctx.fillStyle = t.muted;
-    base += rf.size * 1.45;
-    ctx.fillText(rf.lines[0], cx, base);
+  // Country, directly under the name
+  if (d.country) {
+    const size = 26 * sc;
+    base += size * 1.75;
+    ctx.font = font(900, size);
+    const text = d.country.toUpperCase();
+    const spacing = 3 * sc;
+    const textW = ctx.measureText(text).width + spacing * text.length;
+    const pinW = size * 0.75, gap = size * 0.4;
+    const startX = cx - (pinW + gap + textW) / 2;
+    if (!dry) {
+      drawPin(startX + pinW / 2, base, size * 1.05, t.ring, t.bg);
+      ctx.fillStyle = t.muted;
+      ctx.textAlign = 'left';
+      ctx.font = font(900, size);
+      withLetterSpacing(spacing, () => ctx.fillText(text, startX + pinW + gap, base));
+      ctx.textAlign = 'center';
+    }
   }
 
-  if (d.focus) base = drawFocusChip(t, d.focus, cx, base + 22 * sc, sc, maxW);
+  // Role · organization
+  const role = roleLine(d);
+  if (role) {
+    const rf = fitText(role, 700, 32 * sc, 20 * sc, maxW, 1);
+    base += rf.size * 1.6;
+    if (!dry) {
+      ctx.fillStyle = t.text;
+      ctx.fillText(rf.lines[0], cx, base);
+    }
+  }
 
-  if (d.goal) {
-    const size = 28 * sc;
-    const lh = size * 1.3;
-    const room = Math.max(1, Math.min(2, Math.floor((maxBottom - base - 14 * sc) / lh)));
-    ctx.font = `italic 400 ${size}px "${CONFIG.bodyFont}", system-ui, sans-serif`;
-    const lines = wrap(`“${d.goal}”`, maxW * 0.92, room);
-    ctx.fillStyle = t.text;
-    base += 18 * sc;
-    lines.forEach((l) => { base += lh; ctx.fillText(l, cx, base); });
+  // Focus chip
+  if (d.focus) {
+    const chipTop = base + 26 * sc;
+    base = dry ? chipTop + 46 * sc * 1.05 : drawFocusChip(t, d.focus, cx, chipTop, sc * 1.05, maxW);
   }
   return base;
 }
 
-/** Cohort/country line and hashtags, centered on a forward-pointing ribbon. */
+/** Cohort line and hashtags, centered on a forward-pointing ribbon. */
 function drawFooter(d, t, cx, ribbonX, ribbonY, ribbonW, ribbonH, sc) {
   drawRibbonArrow(ribbonX, ribbonY, ribbonW, ribbonH, t.ribbon, t.ribbonAlpha);
   ctx.textAlign = 'center';
@@ -402,14 +440,20 @@ function drawSquare(d, t, W, H) {
   const hf = fitText(CONFIG.program.toUpperCase(), 900, 108, 70, W - 120, 1);
   ctx.fillText(hf.lines[0], cx, 318);
 
-  // Avatar inside its own sprint loop
-  const r = 98, ay = 478;
-  drawLoopArrow(cx, ay, r + 44, -0.2 * Math.PI, 1.55 * Math.PI, 18, t.loop, Math.min(1, t.loopAlpha + 0.25));
+  // Photo (inside its sprint loop) and the person block, centered together
+  // in the space between the headline and the footer ribbon
+  const areaTop = 360, areaBottom = 935, gap = 26;
+  const blockH = drawPersonBlock(d, t, cx, 0, W - 160, 1, true);
+  // Shrink the photo if a long name plus every optional field won't fit
+  const r = Math.max(84, Math.min(112, (areaBottom - areaTop - gap - blockH) / 2 - 56));
+  const loopR = r + 46, extent = loopR + 10;
+  const total = extent * 2 + gap + blockH;
+  const ay = areaTop + Math.max(0, (areaBottom - areaTop - total) / 2) + extent;
+  drawLoopArrow(cx, ay, loopR, -0.2 * Math.PI, 1.55 * Math.PI, 18, t.loop, Math.min(1, t.loopAlpha + 0.25));
   drawAvatar(t, d.fullName, cx, ay, r);
+  drawPersonBlock(d, t, cx, ay + extent + gap, W - 160, 1);
 
-  drawPersonBlock(d, t, cx, ay + r + 52, W - 180, 0.92, 935);
-
-  drawFooter(d, t, cx, 70, 950, W - 120, 100, 0.95);
+  drawFooter(d, t, cx, 70, 955, W - 120, 96, 0.95);
 }
 
 function drawLandscape(d, t, W, H) {
@@ -428,13 +472,14 @@ function drawLandscape(d, t, W, H) {
   ctx.fillText(CONFIG.program.toUpperCase(), W - 44, 80);
 
   // Left column: avatar in its loop
-  const acx = 230, ay = 350, r = 112;
+  const acx = 230, ay = 372, r = 112;
   drawLoopArrow(acx, ay, r + 46, -0.2 * Math.PI, 1.55 * Math.PI, 18, t.loop, Math.min(1, t.loopAlpha + 0.25));
   drawAvatar(t, d.fullName, acx, ay, r);
 
   // Right column: centered text
   const colX = 440, colW = W - colX - 50, cx = colX + colW / 2;
-  drawPersonBlock(d, t, cx, 136, colW, 0.78, 470);
+  const blockH = drawPersonBlock(d, t, cx, 0, colW, 0.8, true);
+  drawPersonBlock(d, t, cx, 120 + Math.max(0, (360 - blockH) / 2), colW, 0.8);
   drawFooter(d, t, cx, colX, 500, colW, 92, 0.78);
 }
 
@@ -480,9 +525,7 @@ function buildPost(d) {
   const focus = d.focus
     ? `My main focus: ${d.focus}.`
     : `My main focus: [the skill you most want to build, e.g. Scrum, flow or systems thinking].`;
-  const goal = d.goal
-    ? `${d.goal}`
-    : `[What will you do differently at work once you've built that skill?]`;
+  const goal = `[What will you do differently at work once you've built that skill?]`;
 
   return [
     OPENERS[openerIndex](cohort),
@@ -553,7 +596,6 @@ function loadImage(src) {
 
 $('card-form').addEventListener('change', render);
 $('card-form').addEventListener('input', (e) => {
-  if (e.target.id === 'goal') $('goal-counter').textContent = `${e.target.value.length}/160`;
   render();
 });
 
