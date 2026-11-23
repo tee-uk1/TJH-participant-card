@@ -10,7 +10,7 @@ It's a prototype that will be refined through the Kaizen process.
 
 - **Form:** full name (required), role, organization, country, cohort, skill improvement focus and an optional photo.
 - **Card:** drawn live as people type, in two themes (**Lavender** and **Lapis**) and two sizes (**square** 1080×1080 and **landscape** 1200×627).
-- **Photo:** zoom with a slider. To reposition it, tap the bright yellow **Move photo** button (on the card's top-right corner, or next to the photo field), drag the photo (mouse or touch), then tap **Done**. Dragging only works in this mode, so the page scrolls normally on phones the rest of the time. The button pulses briefly when a photo is first added.
+- **Photo:** zoom with a slider. To reposition it, tap the bright yellow **Move photo** button (on the card's top-right corner, or next to the photo field), drag the photo (mouse or touch), then tap **Done**. Dragging only works in this mode, so the page scrolls normally on phones the rest of the time. The button pulses briefly whenever a photo is added.
   - Without a photo, the preview shows "YOUR PHOTO HERE" and a tip suggests adding one.
   - The final image uses The Job Hackers logo in the photo circle instead.
 - **Getting the card out:**
@@ -88,7 +88,7 @@ To change the card design (colors, layout, fonts), edit the `CONFIG` block and t
 python -m http.server 5173
 ```
 
-Then open http://localhost:5173. Opening `index.html` directly from disk won't work, because the browser blocks the scripts and logo images that way.
+Then open http://localhost:5173. Use a local server rather than opening `index.html` straight from disk: the page will display, but browsers treat images opened from disk as untrusted, so Download, Copy image and Share won't work.
 
 ## Deploy
 
