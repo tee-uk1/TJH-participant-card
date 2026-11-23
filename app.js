@@ -138,11 +138,12 @@ function getData() {
 
 /* ---------- drawing primitives ---------- */
 
+// Canvas letter-spacing isn't supported everywhere (e.g. older Safari); skip it there.
+const HAS_LETTER_SPACING = 'letterSpacing' in CanvasRenderingContext2D.prototype;
 function withLetterSpacing(px, fn) {
-  const had = 'letterSpacing' in ctx;
-  if (had) ctx.letterSpacing = `${px}px`;
+  if (HAS_LETTER_SPACING) ctx.letterSpacing = `${px}px`;
   fn();
-  if (had) ctx.letterSpacing = '0px';
+  if (HAS_LETTER_SPACING) ctx.letterSpacing = '0px';
 }
 
 /** Thick arc with a rounded tail and an arrowhead at its end (clockwise). */
@@ -207,7 +208,7 @@ function drawBrand(t, x, top, h, align = 'left') {
   ctx.textAlign = 'left';
 }
 
-function drawAvatar(t, name, cx, cy, r) {
+function drawAvatar(t, cx, cy, r) {
   // Soft outer halo, then the Saffron ring
   ctx.beginPath();
   ctx.arc(cx, cy, r + 20, 0, Math.PI * 2);
@@ -345,7 +346,7 @@ function drawPersonBlock(d, t, cx, top, maxW, sc, dry = false) {
     ctx.font = font(900, size);
     const text = d.country.toUpperCase();
     const spacing = 3 * sc;
-    const textW = ctx.measureText(text).width + spacing * text.length;
+    const textW = ctx.measureText(text).width + (HAS_LETTER_SPACING ? spacing * text.length : 0);
     const pinW = size * 0.75, gap = size * 0.4;
     const startX = cx - (pinW + gap + textW) / 2;
     if (!dry) {
@@ -439,7 +440,7 @@ function drawSquare(d, t, W, H) {
   const total = extent * 2 + gap + blockH;
   const ay = areaTop + Math.max(0, (areaBottom - areaTop - total) / 2) + extent;
   drawLoopArrow(cx, ay, loopR, -0.2 * Math.PI, 1.55 * Math.PI, 18, t.loop, Math.min(1, t.loopAlpha + 0.25));
-  drawAvatar(t, d.fullName, cx, ay, r);
+  drawAvatar(t, cx, ay, r);
   drawPersonBlock(d, t, cx, ay + extent + gap, W - 160, 1);
 
   drawFooter(d, t, cx, 70, 955, W - 120, 96, 0.95);
@@ -463,7 +464,7 @@ function drawLandscape(d, t, W, H) {
   // Left column: avatar in its loop
   const acx = 230, ay = 372, r = 112;
   drawLoopArrow(acx, ay, r + 46, -0.2 * Math.PI, 1.55 * Math.PI, 18, t.loop, Math.min(1, t.loopAlpha + 0.25));
-  drawAvatar(t, d.fullName, acx, ay, r);
+  drawAvatar(t, acx, ay, r);
 
   // Right column: centered text
   const colX = 440, colW = W - colX - 50, cx = colX + colW / 2;

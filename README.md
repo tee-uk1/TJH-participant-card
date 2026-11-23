@@ -1,14 +1,28 @@
-# Agile MBA Participant Card
+# Agile MBA™ Participant Card Generator
+
+**Live:** https://tee-uk1.github.io/TJH-participant-card/
 
 A small static web page where people who have enrolled in The Job Hackers' Agile MBA™ can make an image to share on LinkedIn, either before their course starts or while it's running. It's a prototype that will be refined through the Kaizen process.
 
 - Everything runs in the browser. Nothing people type is uploaded or stored.
-- Square format (1080×1080) and landscape format (1200×627).
+- Square format (1080×1080) and landscape format (1200×627), in two themes (Lavender and Lapis).
 - Photo upload with zoom and drag-to-reposition. Without a photo, the preview shows "YOUR PHOTO HERE", the page suggests adding one, and the downloaded/copied/shared image uses The Job Hackers logo in the circle instead.
 - Download the card as a PNG, copy it to the clipboard and paste it straight into a LinkedIn post, or (on phones) send it to the LinkedIn app with the Share button.
 - Ready-to-paste image description (alt text) for screen-reader users.
 - Works on phones as well as desktop.
-- Generates a suggested LinkedIn post with a copy button.
+- Generates a suggested LinkedIn post (a skeleton with prompts), plus a short "how to post on LinkedIn" guide.
+
+## Files
+
+| File | What it is | Who edits it |
+|---|---|---|
+| `config.js` | Wording, links, focus list, post text, hashtags, cohort rules, usage counting | Anyone |
+| `index.html` | The page and form | Developers |
+| `style.css` | Page styling | Developers |
+| `app.js` | Draws the card, builds the post and alt text, handles download/copy/share and photo dragging | Developers |
+| `cohorts.js` | Works out which quarters appear in the cohort dropdown | Developers |
+| `countries.js` | Country suggestions for the Country field | Rarely |
+| `assets/` | The Lapis and white Job Hackers logos | Rarely |
 
 ## Run locally
 
@@ -36,7 +50,7 @@ Commit the change to `main` and the live site updates in about 2 minutes.
 Edit the `CONFIG` block at the top of `app.js`:
 
 - `logos`: logo variants in `assets/`. Each theme chooses `white` (dark backgrounds) or `lapis` (light backgrounds).
-- `themes`: two card themes built from the brand palette. **Lavender** (default) has a soft Lapis-tint background (`#CACAED`), a light top band with the Lapis logo, and Lapis text. **Lapis** is the dark version with the white logo and Saffron highlights. Both use the same "iteration loop" arrows as a background motif, a loop around the photo, and a forward-pointing ribbon for the cohort and hashtags.
+- `themes`: two card themes built from the brand palette. **Lavender** (default) has a soft Lapis-tint background (`#CACAED`), a light top band with the Lapis logo, and Lapis text. **Lapis** is the dark version with the white logo and Saffron highlights. Both use the same "iteration loop" arrows as a background motif, a loop around the photo, and a forward-pointing ribbon for the cohort and the `cardFooter` items (`#AlwaysAJobHacker · thejobhackers.org`).
 - `headingFont` / `bodyFont`: Lato (the primary brand font). Poppins is loaded too if you want to switch the headings to it.
 
 ## Form fields
@@ -74,7 +88,15 @@ To turn it on, sign up at goatcounter.com, pick a site code (e.g. `tjh-agile-car
 
 ## Deploy
 
-The site is plain HTML, CSS and JS with no build step. You can host it on GitHub Pages, Netlify or any static host.
+The site is plain HTML, CSS and JS with no build step. It's hosted on GitHub Pages from the `main` branch: every push to `main` redeploys it within a couple of minutes. It will also work on Netlify, Cloudflare Pages or any static host.
+
+## Handing over to The Job Hackers
+
+When the repository is transferred to a Job Hackers GitHub account:
+
+- The live address changes to `https://<new-owner>.github.io/TJH-participant-card/`, or to a custom domain if one is set up (e.g. `card.thejobhackers.org`). GitHub redirects the old repo URL, but **not** the old GitHub Pages address, so update any links you've shared.
+- Check GitHub Pages is still switched on (Settings → Pages → deploy from `main`, folder `/`).
+- If usage counting is wanted, create the GoatCounter account under The Job Hackers and add its code to `config.js`.
 
 ## License and credits
 
