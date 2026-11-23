@@ -4,8 +4,10 @@ A small static web page where people who have enrolled in The Job Hackers' Agile
 
 - Everything runs in the browser. Nothing people type is uploaded or stored.
 - Square format (1080×1080) and landscape format (1200×627).
-- Photo upload with zoom. If there's no photo, the card shows initials.
-- Download the card as a PNG, or copy it to the clipboard and paste it straight into a LinkedIn post.
+- Photo upload with zoom and drag-to-reposition. If there's no photo, the card shows initials and the page suggests adding one.
+- Download the card as a PNG, copy it to the clipboard and paste it straight into a LinkedIn post, or (on phones) send it to the LinkedIn app with the Share button.
+- Ready-to-paste image description (alt text) for screen-reader users.
+- Works on phones as well as desktop.
 - Generates a suggested LinkedIn post with a copy button.
 
 ## Run locally
@@ -16,22 +18,32 @@ python -m http.server 5173
 
 Then open http://localhost:5173.
 
-## Customize branding
+## Editing wording, links and lists (no coding needed)
+
+Everything non-technical lives in **`config.js`**, with instructions at the top of the file:
+
+- card wording (`headlineIntro`, `focusLabel`, `cardFooter`)
+- links (`courseUrl`, `linkedinPage`)
+- the skill-focus list (`focusOptions`)
+- the suggested LinkedIn post (`postOpeners`, `postParagraphs`, `postHashtags`)
+- cohort dropdown rules (`cohorts`)
+- usage counting (`goatcounterCode`)
+
+Commit the change to `main` and the live site updates in about 2 minutes.
+
+## Customize the design (developers)
 
 Edit the `CONFIG` block at the top of `app.js`:
 
 - `logos`: logo variants in `assets/`. Each theme chooses `white` (dark backgrounds) or `lapis` (light backgrounds).
 - `themes`: two card themes built from the brand palette. **Lavender** (default) has a soft Lapis-tint background (`#CACAED`), a light top band with the Lapis logo, and Lapis text. **Lapis** is the dark version with the white logo and Saffron highlights. Both use the same "iteration loop" arrows as a background motif, a loop around the photo, and a forward-pointing ribbon for the cohort and hashtags.
 - `headingFont` / `bodyFont`: Lato (the primary brand font). Poppins is loaded too if you want to switch the headings to it.
-- `cardHashtags`: hashtags on the image (`#AgileMBA #AlwaysAJobHacker`). `hashtags`: hashtags in the post.
-- `courseUrl`: course page linked at the end of the post.
-- `headlineIntro`: the line above "AGILE MBA™" on the card.
 
 ## Form fields
 
 - **Full name** (required), **Role**, **Organization** (optional) and **Country** (optional, with autocomplete; shown under the name with a location pin).
 - **Cohort**: a dropdown of quarters that updates itself (see below).
-- **Skill improvement focus** (optional): edit the list in `CONFIG.focusOptions` in `app.js`.
+- **Skill improvement focus** (optional): shown on the card as "BUILDING SKILLS IN …". Edit the list in `config.js`.
 
 ## Rolling cohort list
 
@@ -41,11 +53,11 @@ Edit the `CONFIG` block at the top of `app.js`:
 - The list starts at the previous quarter (but never before Q4 2026) and shows 4 quarters, so people can still pick the next quarter if they enrolled early.
 - When a quarter ends, the oldest option drops off and the next one is added. For example, on April 1, 2027, Q4 2026 is removed and Q4 2027 is added.
 - To preview a future date, add `?today=YYYY-MM-DD` to the URL, e.g. `http://localhost:5173/?today=2027-04-01`.
-- Change `COHORT_CONFIG` to adjust the first cohort, how many past quarters stay listed, or how many options to show.
+- Change `cohorts` in `config.js` to adjust the first cohort, how many past quarters stay listed, or how many options to show.
 
 ## Suggested LinkedIn post
 
-The post is a skeleton, not a finished post. It fills in the cohort and focus, and leaves `[bracketed]` prompts for people to answer in their own words. The opening line varies, so posts from the same cohort don't read like copies. A counter shows how many brackets are still left. Edit the wording in `OPENERS` and `buildPost()` in `app.js`.
+The post is a skeleton, not a finished post. It fills in the cohort and focus, and leaves `[bracketed]` prompts for people to answer in their own words. The opening line varies, so posts from the same cohort don't read like copies. A counter shows how many brackets are still left. It includes a prompt to tag The Job Hackers' LinkedIn page. Edit the wording in `config.js`.
 
 ## Usage counting
 
@@ -55,9 +67,10 @@ It counts:
 - page visits (automatic)
 - `card-download/<cohort>/<format>/<theme>`, e.g. `card-download/q4-2026/square/lavender`
 - `card-copied/<cohort>/<format>/<theme>` (when the image is copied instead of downloaded)
+- `card-shared/<cohort>/<format>/<theme>` (when shared from a phone)
 - `post-copied`
 
-To turn it on, sign up at goatcounter.com, pick a site code (e.g. `tjh-agile-card`), and set `goatcounterCode: 'tjh-agile-card'` in `app.js`. While the code is empty, nothing is sent anywhere.
+To turn it on, sign up at goatcounter.com, pick a site code (e.g. `tjh-agile-card`), and set `goatcounterCode: 'tjh-agile-card'` in `config.js`. While the code is empty, nothing is sent anywhere.
 
 ## Deploy
 

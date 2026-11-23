@@ -7,7 +7,7 @@
  *   window start = max(previous quarter, FIRST cohort)
  *   options      = COUNT quarters from that start
  *
- * With the settings below:
+ * With the default settings (see SETTINGS.cohorts in config.js):
  *   Q4 2026 (now) -> Q4 2026, Q1 2027, Q2 2027, Q3 2027
  *   Q1 2027       -> Q4 2026, Q1 2027, Q2 2027, Q3 2027
  *   Q2 2027       -> Q1 2027, Q2 2027, Q3 2027, Q4 2027
@@ -21,10 +21,12 @@
  * Testing: add ?today=YYYY-MM-DD to the page URL to see what the
  * dropdown will look like on that date, e.g. index.html?today=2027-04-01
  * ========================================================= */
+// Values come from SETTINGS.cohorts in config.js when it's loaded.
+const COHORT_SETTINGS = (typeof SETTINGS !== 'undefined' && SETTINGS.cohorts) || {};
 const COHORT_CONFIG = {
-  first: { year: 2026, q: 4 }, // earliest cohort ever offered
-  lookback: 1,                 // how many past quarters stay selectable
-  count: 4,                    // how many options to show in total
+  first: { year: COHORT_SETTINGS.firstYear || 2026, q: COHORT_SETTINGS.firstQuarter || 4 }, // earliest cohort ever offered
+  lookback: COHORT_SETTINGS.pastQuarters ?? 1,   // how many past quarters stay selectable
+  count: COHORT_SETTINGS.totalOptions || 4,      // how many options to show in total
   timeZone: 'America/Los_Angeles',
 };
 

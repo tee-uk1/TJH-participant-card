@@ -191,8 +191,25 @@ canvas {
 .btn.primary:hover { background: var(--saffron-dark); }
 .btn.secondary { background: transparent; color: var(--lapis); box-shadow: inset 0 0 0 2px var(--lapis); }
 .btn.secondary:hover { background: var(--border); }
+.nudge {
+  text-align: center;
+  font-size: 15px;
+  color: var(--lapis-dark);
+  background: var(--bg);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin: 4px auto 0;
+  max-width: 520px;
+}
+.nudge[hidden] { display: none; }
+.nudge a { color: var(--lapis); font-weight: 700; }
+canvas.has-photo { cursor: grab; touch-action: none; }
+canvas.dragging { cursor: grabbing; }
+#alt-text { font-size: 14px; color: var(--text); }
 .copy-status { text-align: center; font-size: 14px; font-weight: 700; color: var(--lapis); min-height: 21px; margin: 0; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn[hidden] { display: none; }
 
 .link-btn {
   font: inherit;
@@ -211,3 +228,22 @@ canvas {
 .post-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
 .bracket-status { font-size: 14px; font-weight: 700; color: #a95400; } /* darkest readable Saffron tint */
 .bracket-status.done { color: var(--lapis); }
+
+/* ---------- phones ---------- */
+@media (max-width: 600px) {
+  .topbar-inner { padding: 8px 16px; }
+  .brand { height: 46px; }
+  .tool-name { font-size: 14px; }
+  .site-header { padding: 28px 16px 24px; }
+  .site-header h1 { font-size: 30px; }
+  .lede { font-size: 16px; }
+  .steps { flex-direction: column; align-items: center; gap: 8px; font-size: 15px; }
+  .layout { padding: 16px 12px 40px; gap: 16px; }
+  .panel { padding: 16px; }
+  .canvas-wrap { padding: 10px; }
+  canvas { max-height: none; }
+  .actions .btn { flex: 1 1 100%; }
+  /* 16px+ stops iOS Safari zooming in when a field is tapped */
+  input[type="text"], textarea, select { font-size: 16px; }
+  .field-row { grid-template-columns: 1fr; }
+}

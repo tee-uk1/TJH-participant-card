@@ -74,6 +74,7 @@
           <input id="zoom" type="range" min="1" max="3" step="0.01" value="1" />
           <button type="button" id="remove-photo" class="link-btn">Remove</button>
         </div>
+        <p class="hint" id="drag-hint" hidden>Tip: drag the photo on the card to reposition it.</p>
       </div>
 
       <div class="field-row">
@@ -98,8 +99,10 @@
       <div class="actions">
         <button type="button" id="download" class="btn primary">Download PNG</button>
         <button type="button" id="copy-image" class="btn secondary">Copy image</button>
+        <button type="button" id="share-image" class="btn secondary" hidden>Share…</button>
       </div>
       <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+      <p class="nudge" id="photo-nudge">📸 Cards with a photo get noticed more. Add yours under <a href="#photo">Your photo</a>.</p>
 
       <div class="post">
         <div class="post-head">
@@ -114,9 +117,19 @@
         </div>
         <p class="hint">On LinkedIn, click <em>Start a post</em>, add your downloaded image, then paste your text.</p>
       </div>
+
+      <div class="post">
+        <div class="post-head">
+          <span class="label">Image description (alt text)</span>
+          <button type="button" id="copy-alt" class="link-btn">Copy text</button>
+        </div>
+        <textarea id="alt-text" rows="3" readonly></textarea>
+        <p class="hint">Helps people using screen readers. On LinkedIn, after adding your image, click <em>Alt text</em> and paste this in.</p>
+      </div>
     </section>
   </main>
 
+  <script src="config.js"></script>
   <script src="cohorts.js"></script>
   <script src="countries.js"></script>
   <script src="app.js"></script>

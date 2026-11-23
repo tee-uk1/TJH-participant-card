@@ -1,37 +1,14 @@
 /* =========================================================
- * CONFIG: edit this block to match The Job Hackers branding
+ * DESIGN CONFIG (developers). Wording, links, hashtags, the focus list
+ * and the post text live in config.js (SETTINGS) so anyone can edit them.
  * ========================================================= */
 const CONFIG = {
-  org: 'The Job Hackers',
-  program: 'Agile MBA™',
-  headlineIntro: "I'm taking part in",
+  ...SETTINGS,
   // Logo variants (transparent PNGs). Each theme picks one via its `logo` key.
   logos: {
     white: 'assets/logo-white.png',
     lapis: 'assets/logo-lapis.png',
   },
-  courseUrl: 'https://www.thejobhackers.org/participant/',
-  cardHashtags: ['#AgileMBA', '#AlwaysAJobHacker'],                              // shown on the image
-  hashtags: ['#AgileMBA', '#AlwaysAJobHacker', '#TheJobHackers', '#Agile', '#Scrum'], // used in the post
-  // Usage counting (see README). Leave empty to turn counting off.
-  // GoatCounter is free for nonprofits, uses no cookies and never receives
-  // what people type: only anonymous events like "card downloaded".
-  goatcounterCode: '',
-  // "Skill improvement focus" dropdown, based on the Agile MBA™ curriculum.
-  focusOptions: [
-    'Agile foundations',
-    'Scrum in practice',
-    'Product ownership & value',
-    'Flow, Kanban & WIP limits',
-    'Systems thinking',
-    'Estimation & uncertainty',
-    'TDD, BDD & technical debt',
-    'Psychological safety',
-    'Leading Agile teams',
-    'Helping teams adopt AI',
-    'Scrum certification (PSM I)',
-    'Moving into an Agile role',
-  ],
   // Brand fonts: Lato is primary (and what the website uses for headings);
   // Poppins is the secondary brand font if you want a different heading feel.
   headingFont: 'Lato',
@@ -78,6 +55,8 @@ const state = {
   themeId: CONFIG.themes[0].id,
   photo: null,   // HTMLImageElement
   zoom: 1,
+  offset: { x: 0, y: 0 }, // photo pan, as a fraction of the photo circle's diameter
+  avatar: null,            // where the photo circle was last drawn {cx, cy, r}
   logos: {},     // variant name -> HTMLImageElement
 };
 
@@ -250,6 +229,7 @@ function drawAvatar(t, name, cx, cy, r) {
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.clip();
+  state.avatar = { cx, cy, r };
   if (state.photo) {
     // Cover-fit the photo into the circle, then apply zoom around the center
     const img = state.photo;
@@ -257,7 +237,11 @@ function drawAvatar(t, name, cx, cy, r) {
     const base = Math.max(d / img.width, d / img.height) * state.zoom;
     const w = img.width * base;
     const h = img.height * base;
-    ctx.drawImage(img, cx - w / 2, cy - h / 2, w, h);
+    // Pan: clamp so the photo always covers the circle, and store the clamped value
+    const maxX = (w - d) / 2 / d, maxY = (h - d) / 2 / d;
+    state.offset.x = Math.max(-maxX, Math.min(maxX, state.offset.x));
+    state.offset.y = Math.max(-maxY, Math.min(maxY, state.offset.y));
+    ctx.drawImage(img, cx - w / 2 + state.offset.x * d, cy - h / 2 + state.offset.y * d, w, h);
   } else {
     ctx.fillStyle = t.avatarBg;
     ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
@@ -276,7 +260,7 @@ function drawFocusChip(t, focus, cx, top, s, maxW) {
   const h = 46 * s;
   const padX = 22 * s;
   ctx.font = font(900, 20 * s);
-  const label = 'FOCUS';
+  const label = CONFIG.focusLabel.toUpperCase();
   const gap = 12 * s;
   const labelW = ctx.measureText(label).width;
   ctx.font = font(700, 24 * s);
@@ -392,7 +376,7 @@ function drawPersonBlock(d, t, cx, top, maxW, sc, dry = false) {
 function drawFooter(d, t, cx, ribbonX, ribbonY, ribbonW, ribbonH, sc) {
   drawRibbonArrow(ribbonX, ribbonY, ribbonW, ribbonH, t.ribbon, t.ribbonAlpha);
   ctx.textAlign = 'center';
-  const tags = CONFIG.cardHashtags.join('   ');
+  const tags = CONFIG.cardFooter.join('   ·   ');
   const line = cohortLine(d);
   const maxW = ribbonW - ribbonH * 1.4;
   const mid = ribbonY + ribbonH / 2;
@@ -501,9 +485,14 @@ function render() {
   else drawSquare(d, t, W, H);
 
   updatePost(d);
+  $('alt-text').value = buildAltText(d);
+  $('photo-nudge').hidden = !!state.photo;
+  canvas.classList.toggle('has-photo', !!state.photo);
+  $('drag-hint').hidden = !state.photo;
   const ready = !!$('fullName').value.trim();
   $('download').disabled = !ready;
   $('copy-image').disabled = !ready;
+  $('share-image').disabled = !ready;
 }
 
 /* ---------- LinkedIn post skeleton ----------
@@ -511,39 +500,22 @@ function render() {
  * prompts for people to answer in their own words, and the opening line
  * varies, so posts from the same cohort don't read like copies. */
 
-const OPENERS = [
-  (c) => `I've just joined ${c} of The Job Hackers' Agile MBA™! 🚀`,
-  (c) => `New chapter: I'm taking part in the Agile MBA™ from The Job Hackers (${c}).`,
-  (c) => `Back in learning mode 📚 I've signed up for The Job Hackers' Agile MBA™, ${c}.`,
-  (c) => `Some personal news: I'm part of ${c} of the Agile MBA™ with The Job Hackers.`,
-  (c) => `[Write your own opening line, e.g. a question or a moment that made you sign up]`,
-];
-let openerIndex = Math.floor(Math.random() * (OPENERS.length - 1));
+const fill = (tpl, vars) => tpl.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+
+let openerIndex = Math.floor(Math.random() * Math.max(1, CONFIG.postOpeners.length - 1));
 
 function buildPost(d) {
-  const cohort = d.cohort ? `the ${d.cohort} cohort` : 'the latest cohort';
-  const focus = d.focus
-    ? `My main focus: ${d.focus}.`
-    : `My main focus: [the skill you most want to build, e.g. Scrum, flow or systems thinking].`;
-  const goal = `[What will you do differently at work once you've built that skill?]`;
-
+  const vars = {
+    cohort: d.cohort ? `the ${d.cohort} cohort` : 'the latest cohort',
+    focus: d.focus,
+    courseUrl: CONFIG.courseUrl,
+  };
+  vars.focusLine = d.focus ? fill(CONFIG.postFocus, vars) : CONFIG.postFocusMissing;
   return [
-    OPENERS[openerIndex](cohort),
-    '',
-    `Why now: [In a sentence or two, what made you sign up? A challenge at work, a career move, a team you want to help?]`,
-    '',
-    `${focus} ${goal}`,
-    '',
-    `Over six weeks of live sessions we'll cover [name 2 or 3 topics you're most curious about, e.g. Scrum, product development flow, systems thinking, psychological safety].`,
-    '',
-    `[Optional: thank someone who recommended the course, or invite your network to join a future cohort.]`,
-    '',
-    `The Job Hackers is a volunteer-led nonprofit that makes learning about modern knowledge work affordable for people around the world.`,
-    '',
-    `Find out more about the Agile MBA™: ${CONFIG.courseUrl}`,
-    '',
-    CONFIG.hashtags.join(' '),
-  ].join('\n');
+    fill(CONFIG.postOpeners[openerIndex], vars),
+    ...CONFIG.postParagraphs.map((p) => fill(p, vars)),
+    CONFIG.postHashtags.join(' '),
+  ].join('\n\n');
 }
 
 function updateBracketStatus() {
@@ -608,7 +580,7 @@ $('new-opener').addEventListener('click', () => {
   const post = $('post-text');
   if (post.dataset.edited === 'true' &&
       !confirm('This will replace the text you have written so far. Continue?')) return;
-  openerIndex = (openerIndex + 1) % OPENERS.length;
+  openerIndex = (openerIndex + 1) % CONFIG.postOpeners.length;
   post.dataset.edited = 'false';
   updatePost(getData());
 });
@@ -638,6 +610,7 @@ $('photo').addEventListener('change', async (e) => {
   try {
     state.photo = await loadImage(url);
     state.zoom = 1;
+    state.offset = { x: 0, y: 0 };
     $('zoom').value = 1;
     $('photo-controls').hidden = false;
   } catch {
@@ -650,6 +623,7 @@ $('zoom').addEventListener('input', (e) => { state.zoom = parseFloat(e.target.va
 
 $('remove-photo').addEventListener('click', () => {
   state.photo = null;
+  state.offset = { x: 0, y: 0 };
   $('photo').value = '';
   $('photo-controls').hidden = true;
   render();
@@ -711,6 +685,84 @@ $('copy-image').addEventListener('click', async () => {
   } catch {
     showCopyStatus("Couldn't copy the image. Please use Download PNG instead.");
   }
+});
+
+/* ---------- share sheet (phones): send the card straight to the LinkedIn app ---------- */
+function cardFile() {
+  return new Promise((resolve) => canvas.toBlob((blob) => {
+    const slug = slugify($('fullName').value.trim() || 'participant');
+    resolve(new File([blob], `agile-mba-${slug}.png`, { type: 'image/png' }));
+  }, 'image/png'));
+}
+
+(function setupShare() {
+  // Only offer it where the browser can share image files (mostly phones and tablets)
+  try {
+    const test = new File([new Blob()], 'x.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [test] })) $('share-image').hidden = false;
+  } catch { /* not supported */ }
+})();
+
+$('share-image').addEventListener('click', async () => {
+  const d = getData();
+  countEvent(`card-shared/${slugify(d.cohort || 'no-cohort')}/${d.format}/${state.themeId}`);
+  try {
+    await navigator.share({ files: [await cardFile()] });
+  } catch (err) {
+    if (err && err.name !== 'AbortError') showCopyStatus("Couldn't open sharing. Please use Download PNG instead.");
+  }
+});
+
+/* ---------- drag the photo to reposition it (mouse and touch) ---------- */
+let drag = null;
+const toCanvas = (e) => {
+  const rect = canvas.getBoundingClientRect();
+  return { x: (e.clientX - rect.left) * (canvas.width / rect.width), y: (e.clientY - rect.top) * (canvas.height / rect.height) };
+};
+canvas.addEventListener('pointerdown', (e) => {
+  if (!state.photo || !state.avatar) return;
+  const p = toCanvas(e);
+  const { cx, cy, r } = state.avatar;
+  if (Math.hypot(p.x - cx, p.y - cy) > r * 1.4) return; // only grab near the photo
+  drag = { x: p.x, y: p.y };
+  canvas.setPointerCapture(e.pointerId);
+  canvas.classList.add('dragging');
+  e.preventDefault();
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const p = toCanvas(e);
+  const d = state.avatar.r * 2;
+  state.offset.x += (p.x - drag.x) / d;
+  state.offset.y += (p.y - drag.y) / d;
+  drag = p;
+  render();
+});
+const endDrag = () => { drag = null; canvas.classList.remove('dragging'); };
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+
+/* ---------- alt text ---------- */
+function buildAltText(d) {
+  const name = $('fullName').value.trim() || 'A participant';
+  const role = roleLine(d);
+  let text = `Card announcing that ${name}${role ? `, ${role},` : ''} is taking part in ${CONFIG.org}' ${CONFIG.program}`;
+  text += d.cohort ? ` (${d.cohort} cohort).` : '.';
+  if (d.country) text += ` Location: ${d.country}.`;
+  if (d.focus) text += ` ${CONFIG.focusLabel}: ${d.focus}.`;
+  return text;
+}
+
+$('copy-alt').addEventListener('click', async () => {
+  const btn = $('copy-alt');
+  try {
+    await navigator.clipboard.writeText($('alt-text').value);
+    btn.textContent = 'Copied!';
+  } catch {
+    $('alt-text').select();
+    btn.textContent = 'Press Ctrl+C to copy';
+  }
+  setTimeout(() => (btn.textContent = 'Copy text'), 2000);
 });
 
 $('copy-post').addEventListener('click', async () => {
