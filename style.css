@@ -3,8 +3,8 @@
    Every color comes from the brand tonal maps (Lapis, Saffron, Sunglow, Green). */
 :root {
   --bg: #f6f6fc;        /* lightest Lapis tint */
-  --bg-alt: #fff1e4;    /* light Saffron tint */
-  --hero: #ffe7d0;      /* Saffron tint */
+  --bg-alt: #d9d9f2;    /* Lapis tint */
+  --hero: #d9d9f2;      /* Lapis tint */
   --panel: #fffbf7;     /* lightest Saffron tint */
   --field: #f6f6fc;
   --on-saffron: #fffbf7;
@@ -49,7 +49,7 @@ body {
 }
 
 /* ---------- page header ---------- */
-.hero { background: var(--hero); border-bottom: 1px solid #ffd4a9; }
+.hero { background: var(--hero); border-bottom: 1px solid #cacaed; }
 .site-header {
   max-width: 1200px;
   margin: 0 auto;
@@ -62,7 +62,7 @@ body {
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #a95400; /* darkest readable Saffron tint */
+  color: #4646c1; /* Lapis */
 }
 .site-header h1 {
   margin: 0 0 10px;
