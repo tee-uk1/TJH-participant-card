@@ -63,3 +63,9 @@ To turn it on, sign up at goatcounter.com, pick a site code (e.g. `tjh-agile-car
 ## Deploy
 
 The site is plain HTML, CSS and JS with no build step. You can host it on GitHub Pages, Netlify or any static host.
+
+## License and credits
+
+Released under the [MIT License](LICENSE). Copyright (c) 2026 The Job Hackers.
+
+Created by [tee-uk1](https://github.com/tee-uk1) for The Job Hackers.
