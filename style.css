@@ -112,6 +112,31 @@ body {
   border: 1px solid var(--lapis);
   border-radius: var(--radius);
   padding: 24px;
+  box-shadow: 0 10px 28px rgba(31, 31, 94, 0.10), 0 2px 6px rgba(31, 31, 94, 0.06);
+}
+
+/* LinkedIn post: its own full-width box under the form and preview */
+.post-panel { grid-column: 1 / -1; }
+.post-panel h2 { margin: 0 0 4px; font-size: 24px; font-weight: 900; color: var(--lapis); }
+.post-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 24px;
+  margin-top: 12px;
+  align-items: start;
+}
+.post-side { display: flex; flex-direction: column; gap: 18px; }
+.post-grid .post { margin-top: 0; }
+.how-to {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.how-to ol { margin: 8px 0 0; padding-left: 20px; color: var(--text); font-size: 15px; }
+.how-to li + li { margin-top: 6px; }
+@media (max-width: 860px) {
+  .post-grid { grid-template-columns: 1fr; }
 }
 
 /* ---------- form ---------- */

@@ -103,28 +103,46 @@
       </div>
       <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
       <p class="nudge" id="photo-nudge">📸 Cards with a photo get noticed more. Add yours under <a href="#photo">Your photo</a>.</p>
+    </section>
 
-      <div class="post">
-        <div class="post-head">
-          <span class="label">Suggested LinkedIn post</span>
-          <button type="button" id="copy-post" class="link-btn">Copy text</button>
-        </div>
-        <p class="hint">This is a starting point, not a finished post. Replace each <strong>[bracketed]</strong> part in your own words so your post sounds like you.</p>
-        <textarea id="post-text" rows="16"></textarea>
-        <div class="post-foot">
-          <span id="bracket-status" class="bracket-status"></span>
-          <button type="button" id="new-opener" class="link-btn">Try a different opening line</button>
-        </div>
-        <p class="hint">On LinkedIn, click <em>Start a post</em>, add your downloaded image, then paste your text.</p>
-      </div>
+    <section class="panel post-panel" aria-labelledby="post-title">
+      <h2 id="post-title">Your LinkedIn post</h2>
+      <p class="hint">This is a starting point, not a finished post. Replace each <strong>[bracketed]</strong> part in your own words so your post sounds like you.</p>
 
-      <div class="post">
-        <div class="post-head">
-          <span class="label">Image description (alt text)</span>
-          <button type="button" id="copy-alt" class="link-btn">Copy text</button>
+      <div class="post-grid">
+        <div class="post">
+          <div class="post-head">
+            <span class="label">Suggested post</span>
+            <button type="button" id="copy-post" class="link-btn">Copy text</button>
+          </div>
+          <textarea id="post-text" rows="18"></textarea>
+          <div class="post-foot">
+            <span id="bracket-status" class="bracket-status"></span>
+            <button type="button" id="new-opener" class="link-btn">Try a different opening line</button>
+          </div>
         </div>
-        <textarea id="alt-text" rows="3" readonly></textarea>
-        <p class="hint">Helps people using screen readers. On LinkedIn, after adding your image, click <em>Alt text</em> and paste this in.</p>
+
+        <div class="post-side">
+          <div class="post">
+            <div class="post-head">
+              <span class="label">Image description (alt text)</span>
+              <button type="button" id="copy-alt" class="link-btn">Copy text</button>
+            </div>
+            <textarea id="alt-text" rows="5" readonly></textarea>
+            <p class="hint">Helps people using screen readers.</p>
+          </div>
+
+          <div class="how-to">
+            <span class="label">How to post on LinkedIn</span>
+            <ol>
+              <li>Click <strong>Start a post</strong>.</li>
+              <li>Add your card: upload the PNG, or paste it if you used <strong>Copy image</strong>.</li>
+              <li>Paste your post text and fill in every <strong>[bracket]</strong>.</li>
+              <li>Type <strong>@The Job Hackers</strong> and pick the page to tag it.</li>
+              <li>Click <strong>Alt text</strong> on the image and paste the description.</li>
+            </ol>
+          </div>
+        </div>
       </div>
     </section>
   </main>
