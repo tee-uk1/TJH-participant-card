@@ -67,7 +67,7 @@ const SETTINGS = {
     "{focusLine} [What will you do differently at work once you've built that skill?]",
     "Over six weeks of live sessions we'll cover [name 2 or 3 topics you're most curious about, e.g. Scrum, product development flow, systems thinking, psychological safety].",
     '[Optional: thank someone who recommended the course, or invite your network to join a future cohort.]',
-    'Thanks to [type @The Job Hackers and pick their page from the list so they get tagged], a volunteer-led nonprofit that makes learning about modern knowledge work affordable for people around the world.',
+    'Thanks to [type @The Job Hackers and pick their page from the list so they get tagged], a volunteer-led nonprofit helping people around the world grow their careers in modern knowledge work.',
     'Find out more about the Agile MBA™: {courseUrl}',
   ],
   postHashtags: ['#AgileMBA', '#AlwaysAJobHacker', '#TheJobHackers', '#Agile', '#Scrum'],
