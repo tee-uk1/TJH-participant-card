@@ -6,7 +6,7 @@
   <title>Agile MBA™ Participant Card Generator | The Job Hackers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -65,7 +65,6 @@
         <select id="focus" name="focus"></select>
       </div>
 
-
       <div class="field">
         <label for="photo">Your photo <span class="opt">(optional)</span></label>
         <input id="photo" name="photo" type="file" accept="image/*" />
@@ -94,7 +93,7 @@
 
     <section class="panel preview-panel">
       <div class="canvas-wrap">
-        <canvas id="card" width="1080" height="1080" aria-label="Preview of your participant card"></canvas>
+        <canvas id="card" width="1080" height="1080" role="img" aria-label="Preview of your participant card"></canvas>
       </div>
       <div class="actions">
         <button type="button" id="download" class="btn primary">Download PNG</button>
@@ -138,7 +137,7 @@
               <li>Click <strong>Start a post</strong>.</li>
               <li>Add your card: upload the PNG, or paste it if you used <strong>Copy image</strong>.</li>
               <li>Paste your post text and fill in every <strong>[bracket]</strong>.</li>
-              <li>Type <strong>@The Job Hackers</strong> and pick the page to tag it.</li>
+              <li>Type <strong>@The Job Hackers</strong> and pick <a id="linkedin-page" href="https://www.linkedin.com/company/the-job-hackers/" target="_blank" rel="noopener">their page</a> to tag it.</li>
               <li>Click <strong>Alt text</strong> on the image and paste the description.</li>
             </ol>
           </div>

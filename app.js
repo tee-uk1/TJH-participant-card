@@ -9,8 +9,8 @@ const CONFIG = {
     white: 'assets/logo-white.png',
     lapis: 'assets/logo-lapis.png',
   },
-  // Brand fonts: Lato is primary (and what the website uses for headings);
-  // Poppins is the secondary brand font if you want a different heading feel.
+  // Brand fonts: Lato (primary). To try Poppins (secondary) for headings,
+  // add it to the Google Fonts link in index.html and set headingFont: 'Poppins'.
   headingFont: 'Lato',
   bodyFont: 'Lato',
   // Card themes. Every color is from the brand tonal maps: Lapis Lazuli
@@ -116,11 +116,6 @@ function fitText(text, weight, size, minSize, maxWidth, maxLines) {
   }
   ctx.font = font(weight, s);
   return { size: s, lines: wrap(text, maxWidth, maxLines) };
-}
-
-function drawLines(lines, x, y, lineHeight) {
-  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
-  return y + lines.length * lineHeight;
 }
 
 function getData() {
@@ -261,7 +256,7 @@ function drawAvatar(t, cx, cy, r) {
   ctx.restore();
 }
 
-/** Filled "FOCUS · …" chip centered on cx. Returns its bottom y. */
+/** Filled "BUILDING SKILLS IN · …" chip centered on cx. Returns its bottom y. */
 function drawFocusChip(t, focus, cx, top, s, maxW) {
   const h = 46 * s;
   const padX = 22 * s;
@@ -378,7 +373,7 @@ function drawPersonBlock(d, t, cx, top, maxW, sc, dry = false) {
   return base;
 }
 
-/** Cohort line and hashtags, centered on a forward-pointing ribbon. */
+/** Cohort line and the cardFooter items, centered on a forward-pointing ribbon. */
 function drawFooter(d, t, cx, ribbonX, ribbonY, ribbonW, ribbonH, sc) {
   drawRibbonArrow(ribbonX, ribbonY, ribbonW, ribbonH, t.ribbon, t.ribbonAlpha);
   ctx.textAlign = 'center';
@@ -573,9 +568,7 @@ function loadImage(src) {
 }
 
 $('card-form').addEventListener('change', render);
-$('card-form').addEventListener('input', (e) => {
-  render();
-});
+$('card-form').addEventListener('input', render);
 
 $('post-text').addEventListener('input', (e) => {
   e.target.dataset.edited = 'true';
@@ -653,7 +646,6 @@ function exportBlob() {
 const slugify = (str) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 $('download').addEventListener('click', () => {
-  const d = getData();
   const name = $('fullName').value.trim() || 'participant';
   const slug = slugify(name);
   exportBlob().then((blob) => {
@@ -674,7 +666,6 @@ function showCopyStatus(msg) {
 
 // Copy the card straight to the clipboard so it can be pasted into a LinkedIn post.
 $('copy-image').addEventListener('click', async () => {
-  const d = getData();
   if (!navigator.clipboard || !window.ClipboardItem) {
     showCopyStatus("Your browser can't copy images. Please use Download PNG instead.");
     return;
@@ -706,7 +697,6 @@ function cardFile() {
 })();
 
 $('share-image').addEventListener('click', async () => {
-  const d = getData();
   try {
     await navigator.share({ files: [await cardFile()] });
   } catch (err) {
@@ -782,6 +772,7 @@ $('copy-post').addEventListener('click', async () => {
 (async function init() {
   buildSwatches();
   buildFormOptions();
+  $('linkedin-page').href = CONFIG.linkedinPage;
   await Promise.all(Object.entries(CONFIG.logos).map(async ([key, src]) => {
     try { state.logos[key] = await loadImage(src); } catch { /* fall back to wordmark */ }
   }));
@@ -792,7 +783,6 @@ $('copy-post').addEventListener('click', async () => {
       document.fonts.load(font(900, 40)),
       document.fonts.load(font(700, 40)),
       document.fonts.load(font(400, 40)),
-      document.fonts.load(`italic 400 40px "${CONFIG.bodyFont}"`),
     ]);
     await document.fonts.ready;
   } catch { /* system font fallback is fine */ }

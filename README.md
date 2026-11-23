@@ -2,15 +2,71 @@
 
 **Live:** https://tee-uk1.github.io/TJH-participant-card/
 
-A small static web page where people who have enrolled in The Job Hackers' Agile MBA™ can make an image to share on LinkedIn, either before their course starts or while it's running. It's a prototype that will be refined through the Kaizen process.
+A small web page where people enrolled in The Job Hackers' Agile MBA™ can make a branded card to share on LinkedIn, before their course starts or while it's running. It also gives them a starting point for their LinkedIn post.
 
-- Everything runs in the browser. Nothing people type is uploaded or stored.
-- Square format (1080×1080) and landscape format (1200×627), in two themes (Lavender and Lapis).
-- Photo upload with zoom and drag-to-reposition. Without a photo, the preview shows "YOUR PHOTO HERE", the page suggests adding one, and the downloaded/copied/shared image uses The Job Hackers logo in the circle instead.
-- Download the card as a PNG, copy it to the clipboard and paste it straight into a LinkedIn post, or (on phones) send it to the LinkedIn app with the Share button.
-- Ready-to-paste image description (alt text) for screen-reader users.
-- Works on phones as well as desktop.
-- Generates a suggested LinkedIn post (a skeleton with prompts), plus a short "how to post on LinkedIn" guide.
+It's a prototype that will be refined through the Kaizen process.
+
+## What it does
+
+- **Form:** full name (required), role, organization, country, cohort, skill improvement focus and an optional photo.
+- **Card:** drawn live as people type, in two themes (**Lavender** and **Lapis**) and two sizes (**square** 1080×1080 and **landscape** 1200×627).
+- **Photo:** zoom with a slider, and drag it on the card to reposition it (mouse or touch).
+  - Without a photo, the preview shows "YOUR PHOTO HERE" and a tip suggests adding one.
+  - The final image uses The Job Hackers logo in the photo circle instead.
+- **Getting the card out:**
+  - **Download PNG** on any device.
+  - **Copy image**, to paste straight into a LinkedIn post.
+  - **Share…**, only on phones and tablets that support it, which opens the share sheet to send it to the LinkedIn app.
+- **LinkedIn post:** a skeleton with `[bracketed]` prompts for people to fill in themselves.
+  - Opening lines vary, so posts from the same cohort don't read like copies.
+  - A counter shows how many brackets are left.
+- **Alt text:** a ready-to-paste image description for screen-reader users.
+- **"How to post on LinkedIn" guide:** five steps, including tagging The Job Hackers' page.
+- **Phones:** the page works on phones as well as desktop.
+- **Privacy:** everything runs in the browser. Nothing people type or upload is sent anywhere. The only outside request is for Google Fonts (Lato).
+
+## The card
+
+Top to bottom:
+1. Logo band
+2. "I'M TAKING PART IN THE AGILE MBA™"
+3. Photo inside a loop arrow
+4. Name
+5. Country, with a location pin
+6. Role · Organization
+7. "BUILDING SKILLS IN" chip with the chosen focus
+8. A forward-pointing ribbon with the cohort ("Q4 2026 COHORT") and `#AlwaysAJobHacker · thejobhackers.org`
+
+The photo and text are centered together. Long names shrink to fit on one line, and only wrap onto two lines when they're very long. The photo gets a little smaller if it needs the room.
+
+All colors come from The Job Hackers brand palette: Lapis Lazuli `#333399`, Deep Saffron `#FF9933`, Mute Green `#99CC99`, and their tints. The font is Lato.
+
+## Editing wording, links and lists (no coding needed)
+
+Everything non-technical is in **`config.js`**, with instructions at the top of the file:
+
+| Setting | What it controls |
+|---|---|
+| `headlineIntro` | The line above "AGILE MBA™" on the card |
+| `focusLabel` | The label on the skill-focus chip ("Building skills in") |
+| `cardFooter` | The two items under the cohort in the card's footer |
+| `courseUrl` | The course link at the end of the suggested post |
+| `linkedinPage` | The Job Hackers LinkedIn page, linked from the "How to post" guide |
+| `focusOptions` | The skill improvement focus dropdown |
+| `postOpeners`, `postFocus`, `postFocusMissing`, `postParagraphs` | The suggested LinkedIn post. `{cohort}`, `{focus}`, `{focusLine}` and `{courseUrl}` are filled in automatically; `[brackets]` are prompts for the participant |
+| `postHashtags` | Hashtags at the end of the post |
+| `cohorts` | Rules for the cohort dropdown (see below) |
+
+Commit the change to `main` and the live site updates in about 2 minutes.
+
+## Cohort dropdown
+
+`cohorts.js` works out which quarters to offer from today's date, in Pacific Time. There's no server and nothing to update by hand.
+
+- **Default:** the current calendar quarter. Jan–Mar is Q1, Apr–Jun is Q2, Jul–Sep is Q3, Oct–Dec is Q4. There's one cohort per quarter.
+- **Range:** the list starts at the previous quarter (but never before Q4 2026) and shows 4 quarters, so people who enrolled early can pick a future cohort.
+- **Rolling forward:** when a quarter ends, the oldest option drops off and the next one is added. For example, on April 1, 2027, Q4 2026 is removed and Q4 2027 is added. Cards already made are unaffected, since they're just images.
+- **Testing a future date:** add `?today=YYYY-MM-DD` to the URL, e.g. `…/?today=2027-04-01`.
 
 ## Files
 
@@ -18,11 +74,13 @@ A small static web page where people who have enrolled in The Job Hackers' Agile
 |---|---|---|
 | `config.js` | Wording, links, focus list, post text, hashtags, cohort rules | Anyone |
 | `index.html` | The page and form | Developers |
-| `style.css` | Page styling | Developers |
-| `app.js` | Draws the card, builds the post and alt text, handles download/copy/share and photo dragging | Developers |
-| `cohorts.js` | Works out which quarters appear in the cohort dropdown | Developers |
+| `style.css` | Page styling, including the phone layout | Developers |
+| `app.js` | Card themes and drawing, the post and alt text, download/copy/share, photo dragging | Developers |
+| `cohorts.js` | Works out the quarters in the cohort dropdown | Developers |
 | `countries.js` | Country suggestions for the Country field | Rarely |
 | `assets/` | The Lapis and white Job Hackers logos | Rarely |
+
+To change the card design (colors, layout, fonts), edit the `CONFIG` block and the drawing code in `app.js`.
 
 ## Run locally
 
@@ -30,58 +88,23 @@ A small static web page where people who have enrolled in The Job Hackers' Agile
 python -m http.server 5173
 ```
 
-Then open http://localhost:5173.
-
-## Editing wording, links and lists (no coding needed)
-
-Everything non-technical lives in **`config.js`**, with instructions at the top of the file:
-
-- card wording (`headlineIntro`, `focusLabel`, `cardFooter`)
-- links (`courseUrl`, `linkedinPage`)
-- the skill-focus list (`focusOptions`)
-- the suggested LinkedIn post (`postOpeners`, `postParagraphs`, `postHashtags`)
-- cohort dropdown rules (`cohorts`)
-
-Commit the change to `main` and the live site updates in about 2 minutes.
-
-## Customize the design (developers)
-
-Edit the `CONFIG` block at the top of `app.js`:
-
-- `logos`: logo variants in `assets/`. Each theme chooses `white` (dark backgrounds) or `lapis` (light backgrounds).
-- `themes`: two card themes built from the brand palette. **Lavender** (default) has a soft Lapis-tint background (`#CACAED`), a light top band with the Lapis logo, and Lapis text. **Lapis** is the dark version with the white logo and Saffron highlights. Both use the same "iteration loop" arrows as a background motif, a loop around the photo, and a forward-pointing ribbon for the cohort and the `cardFooter` items (`#AlwaysAJobHacker · thejobhackers.org`).
-- `headingFont` / `bodyFont`: Lato (the primary brand font). Poppins is loaded too if you want to switch the headings to it.
-
-## Form fields
-
-- **Full name** (required), **Role**, **Organization** (optional) and **Country** (optional, with autocomplete; shown under the name with a location pin).
-- **Cohort**: a dropdown of quarters that updates itself (see below).
-- **Skill improvement focus** (optional): shown on the card as "BUILDING SKILLS IN …". Edit the list in `config.js`.
-
-## Rolling cohort list
-
-`cohorts.js` works out which quarters to offer from today's date in Pacific Time. There's no server and nothing to update by hand.
-
-- The default is the current calendar quarter: Jan–Mar is Q1, Apr–Jun is Q2, Jul–Sep is Q3, Oct–Dec is Q4. There is one cohort per quarter.
-- The list starts at the previous quarter (but never before Q4 2026) and shows 4 quarters, so people can still pick the next quarter if they enrolled early.
-- When a quarter ends, the oldest option drops off and the next one is added. For example, on April 1, 2027, Q4 2026 is removed and Q4 2027 is added.
-- To preview a future date, add `?today=YYYY-MM-DD` to the URL, e.g. `http://localhost:5173/?today=2027-04-01`.
-- Change `cohorts` in `config.js` to adjust the first cohort, how many past quarters stay listed, or how many options to show.
-
-## Suggested LinkedIn post
-
-The post is a skeleton, not a finished post. It fills in the cohort and focus, and leaves `[bracketed]` prompts for people to answer in their own words. The opening line varies, so posts from the same cohort don't read like copies. A counter shows how many brackets are still left. It includes a prompt to tag The Job Hackers' LinkedIn page. Edit the wording in `config.js`.
+Then open http://localhost:5173. Opening `index.html` directly from disk won't work, because the browser blocks the scripts and logo images that way.
 
 ## Deploy
 
-The site is plain HTML, CSS and JS with no build step. It's hosted on GitHub Pages from the `main` branch: every push to `main` redeploys it within a couple of minutes. It will also work on Netlify, Cloudflare Pages or any static host.
+The site is plain HTML, CSS and JavaScript with no build step. It's hosted on GitHub Pages from the `main` branch, and every push to `main` redeploys it within a couple of minutes. It will also run on Netlify, Cloudflare Pages or any static host.
+
+## Known limits
+
+- **Share and Copy image on phones:** tested in desktop browsers and a simulated phone, but not yet on a real iPhone or Android device.
+- **Scrolling on phones:** once a photo is added, swiping on the card doesn't scroll the page, so that dragging the photo works. People can scroll from the space around the card.
 
 ## Handing over to The Job Hackers
 
-When the repository is transferred to a Job Hackers GitHub account:
+When the repository moves to a Job Hackers GitHub account:
 
-- The live address changes to `https://<new-owner>.github.io/TJH-participant-card/`, or to a custom domain if one is set up (e.g. `card.thejobhackers.org`). GitHub redirects the old repo URL, but **not** the old GitHub Pages address, so update any links you've shared.
-- Check GitHub Pages is still switched on (Settings → Pages → deploy from `main`, folder `/`).
+- **New address:** the live site moves to `https://<new-owner>.github.io/TJH-participant-card/`, or a custom domain if one is set up (e.g. `card.thejobhackers.org`). GitHub redirects the old repo URL, but **not** the old GitHub Pages address, so update any links you've shared.
+- **Pages setting:** check GitHub Pages is still switched on (Settings → Pages → deploy from `main`, folder `/`).
 
 ## License and credits
 

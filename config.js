@@ -5,10 +5,11 @@
  *  hashtags, links, skill-focus list or suggested LinkedIn post.
  *
  *  How to edit:
- *   - Change the text between the quote marks ' '.
- *   - Keep the quote marks, and keep the comma at the end of each line.
- *   - If your text contains an apostrophe, use the curly one (’) or put a
- *     backslash before it, e.g. 'I\'m'.
+ *   - Change only the text inside the quote marks. Text is wrapped in
+ *     either 'single' or "double" quotes; keep whichever is there.
+ *   - Keep the comma at the end of each line.
+ *   - If your text contains an apostrophe (I'm, you're), wrap it in
+ *     "double quotes" rather than 'single quotes'.
  *   - Save, commit to the main branch, and the live site updates in about
  *     2 minutes.
  *
@@ -28,7 +29,7 @@ const SETTINGS = {
 
   /* ---------- Links ---------- */
   courseUrl: 'https://www.thejobhackers.org/participant/',
-  linkedinPage: 'https://www.linkedin.com/company/the-job-hackers/',
+  linkedinPage: 'https://www.linkedin.com/company/the-job-hackers/', // linked from the "How to post" guide
 
   /* ---------- Skill improvement focus dropdown ---------- */
   focusOptions: [
