@@ -5,7 +5,6 @@ const CONFIG = {
   org: 'The Job Hackers',
   program: 'Agile MBA™',
   headlineIntro: "I'm taking part in",
-  quoteLabel: "What I'm looking forward to",
   // Logo variants (transparent PNGs). Each theme picks one via its `logo` key.
   logos: {
     white: 'assets/logo-white.png',
@@ -37,13 +36,30 @@ const CONFIG = {
   // Poppins is the secondary brand font if you want a different heading feel.
   headingFont: 'Lato',
   bodyFont: 'Lato',
-  // Brand palette: Lapis Lazuli #333399, Deep Saffron #FF9933,
-  // Sunglow #FFCC33, Mute Green #99CC99 (tints from the brand tonal maps)
-  // The first theme is the default. 'outline' draws the quote box like the
-  // Lapis-bordered cards on the website.
+  // Card themes. Every color is from the brand tonal maps: Lapis Lazuli
+  // #333399, Deep Saffron #FF9933, Mute Green #99CC99 and their tints.
+  // The first theme is the default.
   themes: [
-    { id: 'website',       name: 'Website',         dark: false, bg1: '#FFFFFF', bg2: '#F6F6FC', accent: '#FF9933', text: '#333399', muted: '#4B4B81', pillText: '#FFFFFF', logo: 'lapis', accentText: '#D06800', quoteStyle: 'outline' },
-    { id: 'lapis-saffron', name: 'Lapis & Saffron', dark: true,  bg1: '#333399', bg2: '#1F1F5E', accent: '#FF9933', text: '#FFFFFF', muted: '#CACAED', pillText: '#1F1F5E', logo: 'white' },
+    {
+      id: 'saffron', name: 'Saffron', swatch: ['#FFC081', '#333399'],
+      bg: '#FFC081', band: '#FFFBF7', ring: '#FF9933', halo: '#FFFBF7',
+      loop: '#FFFBF7', loopAlpha: 0.8,
+      text: '#333399', muted: '#1F1F5E',
+      avatarBg: '#FFE7D0', avatarText: '#333399',
+      chipBg: '#333399', chipLabel: '#FFC081', chipText: '#FFFBF7',
+      ribbon: '#FFFBF7', ribbonAlpha: 0.95, cohort: '#438543', tags: '#333399',
+      logo: 'lapis',
+    },
+    {
+      id: 'lapis', name: 'Lapis', swatch: ['#1F1F5E', '#FF9933'],
+      bg: '#1F1F5E', band: '#161641', ring: '#FF9933', halo: '#29297C',
+      loop: '#5454C6', loopAlpha: 0.35,
+      text: '#FFFBF7', muted: '#CACAED',
+      avatarBg: '#333399', avatarText: '#FFFBF7',
+      chipBg: '#FF9933', chipLabel: '#1F1F5E', chipText: '#1F1F5E',
+      ribbon: '#333399', ribbonAlpha: 1, cohort: '#99CC99', tags: '#FFB66E',
+      logo: 'white',
+    },
   ],
   formats: {
     square:    { w: 1080, h: 1080 },
@@ -150,72 +166,90 @@ function getData() {
 
 /* ---------- drawing primitives ---------- */
 
-function drawBackground(t, W, H) {
-  const g = ctx.createLinearGradient(0, 0, W, H);
-  g.addColorStop(0, t.bg1);
-  g.addColorStop(1, t.bg2);
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, W, H);
-
-  // Decorative rings in the top-right corner
-  ctx.save();
-  ctx.strokeStyle = t.accent;
-  ctx.lineWidth = 2;
-  for (let i = 0; i < 5; i++) {
-    ctx.globalAlpha = 0.18 - i * 0.03;
-    ctx.beginPath();
-    ctx.arc(W, 0, H * 0.28 + i * H * 0.09, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // Accent bar along the bottom
-  ctx.fillStyle = t.accent;
-  ctx.fillRect(0, H - 12, W, 12);
+function withLetterSpacing(px, fn) {
+  const had = 'letterSpacing' in ctx;
+  if (had) ctx.letterSpacing = `${px}px`;
+  fn();
+  if (had) ctx.letterSpacing = '0px';
 }
 
-/** Draw the logo with its top-left at (x, top), `h` px tall. Falls back to a wordmark. */
+/** Thick arc with a rounded tail and an arrowhead at its end (clockwise). */
+function drawLoopArrow(cx, cy, r, start, end, width, color, alpha = 1) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = width;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, start, end);
+  ctx.stroke();
+
+  // Arrowhead: tangent points along the clockwise direction of travel
+  const px = cx + Math.cos(end) * r;
+  const py = cy + Math.sin(end) * r;
+  const tx = -Math.sin(end), ty = Math.cos(end); // tangent
+  const nx = Math.cos(end), ny = Math.sin(end);  // radial
+  const len = width * 1.5, half = width * 1.15;
+  ctx.beginPath();
+  ctx.moveTo(px + tx * len, py + ty * len);
+  ctx.lineTo(px + nx * half, py + ny * half);
+  ctx.lineTo(px - nx * half, py - ny * half);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+/** Rounded ribbon that ends in an arrow point on the right ("moving forward"). */
+function drawRibbonArrow(x, y, w, h, color, alpha = 1) {
+  const tip = h * 0.55;
+  const r = h / 2;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - tip, y);
+  ctx.lineTo(x + w, y + h / 2);
+  ctx.lineTo(x + w - tip, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.arc(x + r, y + r, r, Math.PI / 2, Math.PI * 1.5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+/** Draw the logo `h` px tall. align: left | center | right (x is that edge/center). */
 function drawBrand(t, x, top, h, align = 'left') {
   const logo = state.logos[t.logo];
   if (logo) {
     const w = (logo.width / logo.height) * h;
-    ctx.drawImage(logo, align === 'right' ? x - w : x, top, w, h);
+    const left = align === 'right' ? x - w : align === 'center' ? x - w / 2 : x;
+    ctx.drawImage(logo, left, top, w, h);
     return;
   }
   ctx.fillStyle = t.text;
-  ctx.font = font(800, h * 0.25);
+  ctx.font = font(900, h * 0.25);
   ctx.textAlign = align;
   ctx.fillText(CONFIG.org.toUpperCase(), x, top + h * 0.5);
   ctx.textAlign = 'left';
 }
 
-function drawPill(t, text, edgeX, y, scale = 1, align = 'right') {
-  ctx.font = font(700, 22 * scale);
-  const padX = 22 * scale;
-  const h = 46 * scale;
-  const w = ctx.measureText(text.toUpperCase()).width + padX * 2;
-  const x = align === 'right' ? edgeX - w : edgeX;
-  ctx.fillStyle = t.accent;
-  roundRect(x, y - h / 2 - 8 * scale, w, h, h / 2);
-  ctx.fill();
-  ctx.fillStyle = t.pillText;
-  ctx.textBaseline = 'middle';
-  ctx.fillText(text.toUpperCase(), x + padX, y - 8 * scale + 1);
-  ctx.textBaseline = 'alphabetic';
-}
-
 function drawAvatar(t, name, cx, cy, r) {
-  // Accent ring
+  // Soft outer halo, then the Saffron ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r + 20, 0, Math.PI * 2);
+  ctx.fillStyle = t.halo;
+  ctx.fill();
   ctx.beginPath();
   ctx.arc(cx, cy, r + 10, 0, Math.PI * 2);
-  ctx.fillStyle = t.accent;
+  ctx.fillStyle = t.ring;
   ctx.fill();
 
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.clip();
-
   if (state.photo) {
     // Cover-fit the photo into the circle, then apply zoom around the center
     const img = state.photo;
@@ -225,62 +259,47 @@ function drawAvatar(t, name, cx, cy, r) {
     const h = img.height * base;
     ctx.drawImage(img, cx - w / 2, cy - h / 2, w, h);
   } else {
-    ctx.fillStyle = t.bg2;
+    ctx.fillStyle = t.avatarBg;
     ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
-    ctx.fillStyle = t.text;
-    ctx.font = font(800, r * 0.8);
+    ctx.fillStyle = t.avatarText;
+    ctx.font = font(900, r * 0.78);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(initials(name), cx, cy + r * 0.04);
-    ctx.textAlign = 'left';
+    ctx.fillText(initials(name), cx, cy + r * 0.05);
     ctx.textBaseline = 'alphabetic';
   }
   ctx.restore();
 }
 
-/** Outlined "Focus: …" chip. Returns the y of its bottom edge. */
-function drawFocusChip(t, focus, x, top, s, maxW) {
+/** Filled "FOCUS · …" chip centered on cx. Returns its bottom y. */
+function drawFocusChip(t, focus, cx, top, s, maxW) {
   const h = 46 * s;
-  const padX = 20 * s;
-  ctx.font = font(700, 22 * s);
-  const label = 'FOCUS  ';
+  const padX = 22 * s;
+  ctx.font = font(900, 20 * s);
+  const label = 'FOCUS';
+  const gap = 12 * s;
   const labelW = ctx.measureText(label).width;
-  ctx.font = font(400, 24 * s);
+  ctx.font = font(700, 24 * s);
   let text = focus;
-  while (text.length > 1 && labelW + ctx.measureText(text).width + padX * 2 > maxW) text = text.slice(0, -2) + '…';
-  const w = labelW + ctx.measureText(text).width + padX * 2;
+  while (text.length > 1 && labelW + gap + ctx.measureText(text).width + padX * 2 > maxW) text = text.slice(0, -2) + '…';
+  const w = labelW + gap + ctx.measureText(text).width + padX * 2;
+  const x = cx - w / 2;
 
+  ctx.fillStyle = t.chipBg;
   roundRect(x, top, w, h, h / 2);
-  ctx.strokeStyle = t.accent;
-  ctx.lineWidth = 2 * s;
-  ctx.stroke();
+  ctx.fill();
 
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = t.accentText || t.accent;
-  ctx.font = font(700, 22 * s);
-  ctx.fillText(label, x + padX, top + h / 2 + 1);
-  ctx.fillStyle = t.text;
-  ctx.font = font(400, 24 * s);
-  ctx.fillText(text, x + padX + labelW, top + h / 2 + 1);
-  ctx.textBaseline = 'alphabetic';
-  return top + h;
-}
-
-/** Footer: "Q4 2026 Cohort · Country" on the left, hashtags on the right. */
-function drawFooter(d, t, W, H, M, x, size, bottom) {
-  ctx.font = font(700, size);
-  ctx.textAlign = 'right';
-  ctx.fillStyle = t.accentText || t.accent;
-  const tags = CONFIG.cardHashtags.join('  ');
-  ctx.fillText(tags, W - M, H - bottom);
-  const tagsW = ctx.measureText(tags).width;
   ctx.textAlign = 'left';
-
-  const left = [d.cohort && `${d.cohort} Cohort`, d.country].filter(Boolean).join('  ·  ');
-  if (!left) return;
-  ctx.fillStyle = t.muted;
-  const f = fitText(left, 700, size, size * 0.7, W - M - x - tagsW - 30, 1);
-  ctx.fillText(f.lines[0], x, H - bottom);
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = t.chipLabel;
+  ctx.font = font(900, 20 * s);
+  ctx.fillText(label, x + padX, top + h / 2 + 1);
+  ctx.fillStyle = t.chipText;
+  ctx.font = font(700, 24 * s);
+  ctx.fillText(text, x + padX + labelW + gap, top + h / 2 + 1);
+  ctx.textBaseline = 'alphabetic';
+  ctx.textAlign = 'center';
+  return top + h;
 }
 
 function roleLine(d) {
@@ -288,123 +307,134 @@ function roleLine(d) {
   return d.role || d.company || '';
 }
 
-function drawQuote(t, text, x, y, w, h, s) {
-  if (t.quoteStyle === 'outline') {
-    ctx.fillStyle = '#FFFFFF';
-    roundRect(x, y, w, h, 22 * s);
-    ctx.fill();
-    ctx.strokeStyle = t.text;
-    ctx.lineWidth = 2 * s;
-    ctx.stroke();
-  } else {
-    ctx.fillStyle = t.dark ? 'rgba(255,255,255,0.08)' : 'rgba(51,51,153,0.07)';
-    roundRect(x, y, w, h, 22 * s);
-    ctx.fill();
-    ctx.fillStyle = t.accent;
-    roundRect(x, y, 8 * s, h, 4 * s);
-    ctx.fill();
+function cohortLine(d) {
+  return [d.cohort && `${d.cohort} Cohort`, d.country].filter(Boolean).join('  ·  ').toUpperCase();
+}
+
+/**
+ * Stack the name, role, focus and quote centered on cx, starting at `top`.
+ * `sc` scales every size so the same code serves both formats.
+ */
+function drawPersonBlock(d, t, cx, top, maxW, sc, maxBottom) {
+  ctx.textAlign = 'center';
+
+  const nf = fitText(d.fullName.toUpperCase(), 900, 58 * sc, 34 * sc, maxW, 2);
+  ctx.fillStyle = t.text;
+  let base = top + nf.size * 0.92;
+  withLetterSpacing(1 * sc, () => {
+    nf.lines.forEach((l, i) => ctx.fillText(l, cx, base + i * nf.size * 1.08));
+  });
+  base += (nf.lines.length - 1) * nf.size * 1.08;
+
+  const role = roleLine(d);
+  if (role) {
+    const rf = fitText(role, 700, 30 * sc, 20 * sc, maxW, 1);
+    ctx.fillStyle = t.muted;
+    base += rf.size * 1.45;
+    ctx.fillText(rf.lines[0], cx, base);
   }
 
-  const pad = 36 * s;
-  ctx.fillStyle = t.accentText || t.accent;
-  ctx.font = font(700, 20 * s);
-  ctx.fillText(CONFIG.quoteLabel.toUpperCase(), x + pad, y + pad + 14 * s);
+  if (d.focus) base = drawFocusChip(t, d.focus, cx, base + 22 * sc, sc, maxW);
 
-  const maxLines = Math.max(1, Math.floor((h - pad * 2 - 40 * s) / (44 * s)));
-  const fit = fitText(`“${text}”`, 400, 34 * s, 24 * s, w - pad * 2, maxLines);
-  ctx.fillStyle = t.text;
-  drawLines(fit.lines, x + pad, y + pad + 62 * s, fit.size * 1.3);
+  if (d.goal) {
+    const size = 28 * sc;
+    const lh = size * 1.3;
+    const room = Math.max(1, Math.min(2, Math.floor((maxBottom - base - 14 * sc) / lh)));
+    ctx.font = `italic 400 ${size}px "${CONFIG.bodyFont}", system-ui, sans-serif`;
+    const lines = wrap(`“${d.goal}”`, maxW * 0.92, room);
+    ctx.fillStyle = t.text;
+    base += 18 * sc;
+    lines.forEach((l) => { base += lh; ctx.fillText(l, cx, base); });
+  }
+  return base;
+}
+
+/** Cohort/country line and hashtags, centered on a forward-pointing ribbon. */
+function drawFooter(d, t, cx, ribbonX, ribbonY, ribbonW, ribbonH, sc) {
+  drawRibbonArrow(ribbonX, ribbonY, ribbonW, ribbonH, t.ribbon, t.ribbonAlpha);
+  ctx.textAlign = 'center';
+  const tags = CONFIG.cardHashtags.join('   ');
+  const line = cohortLine(d);
+  const maxW = ribbonW - ribbonH * 1.4;
+  const mid = ribbonY + ribbonH / 2;
+  if (line) {
+    ctx.fillStyle = t.cohort;
+    const f = fitText(line, 900, 28 * sc, 18 * sc, maxW, 1);
+    withLetterSpacing(1.5 * sc, () => ctx.fillText(f.lines[0], cx, mid - 6 * sc));
+    ctx.fillStyle = t.tags;
+    ctx.font = font(900, 26 * sc);
+    ctx.fillText(tags, cx, mid + 30 * sc);
+  } else {
+    ctx.fillStyle = t.tags;
+    ctx.font = font(900, 28 * sc);
+    ctx.fillText(tags, cx, mid + 10 * sc);
+  }
+}
+
+/** Top band with the logo and a Saffron rule under it. */
+function drawBand(t, W, h, logoH, logoX, align) {
+  ctx.fillStyle = t.band;
+  ctx.fillRect(0, 0, W, h);
+  ctx.fillStyle = t.ring;
+  ctx.fillRect(0, h, W, Math.max(5, h * 0.04));
+  drawBrand(t, logoX, (h - logoH) / 2, logoH, align);
 }
 
 /* ---------- layouts ---------- */
 
 function drawSquare(d, t, W, H) {
-  const M = 80;
-  drawBrand(t, M, 50, 140);
-  drawPill(t, CONFIG.program, W - M, 128);
+  const cx = W / 2;
+  ctx.fillStyle = t.bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Background "iteration" loops, partly off-canvas, behind everything
+  drawLoopArrow(-30, 600, 300, -0.42 * Math.PI, 0.38 * Math.PI, 54, t.loop, t.loopAlpha);
+  drawLoopArrow(W + 40, 420, 280, 0.58 * Math.PI, 1.38 * Math.PI, 54, t.loop, t.loopAlpha);
+
+  drawBand(t, W, 150, 118, cx, 'center');
 
   // Headline
-  ctx.fillStyle = t.muted;
-  ctx.font = font(400, 40);
-  ctx.fillText(CONFIG.headlineIntro, M, 262);
+  ctx.textAlign = 'center';
   ctx.fillStyle = t.text;
-  ctx.font = font(800, 88);
-  ctx.fillText(`the ${CONFIG.program}`, M, 360);
+  ctx.font = font(900, 34);
+  withLetterSpacing(4, () => ctx.fillText(`${CONFIG.headlineIntro} the`.toUpperCase(), cx, 218));
+  const hf = fitText(CONFIG.program.toUpperCase(), 900, 108, 70, W - 120, 1);
+  ctx.fillText(hf.lines[0], cx, 318);
 
-  // Avatar + name block
-  const r = 140;
-  const cy = d.goal ? 590 : 650;
-  drawAvatar(t, d.fullName, M + r + 10, cy, r);
+  // Avatar inside its own sprint loop
+  const r = 98, ay = 478;
+  drawLoopArrow(cx, ay, r + 44, -0.2 * Math.PI, 1.55 * Math.PI, 18, t.loop, Math.min(1, t.loopAlpha + 0.25));
+  drawAvatar(t, d.fullName, cx, ay, r);
 
-  // Measure name, role and focus first so the block can be centered on the avatar
-  const tx = M + r * 2 + 70;
-  const tw = W - tx - M;
-  const name = fitText(d.fullName, 800, 64, 40, tw, 2);
-  const nameLH = name.size * 1.1;
-  const role = roleLine(d);
-  const rf = role ? fitText(role, 400, 32, 24, tw, 2) : null;
-  const roleLH = rf ? rf.size * 1.25 : 0;
-  const chipH = 46;
+  drawPersonBlock(d, t, cx, ay + r + 52, W - 180, 0.92, 935);
 
-  const blockH = name.lines.length * nameLH
-    + (rf ? 10 + rf.lines.length * roleLH : 0)
-    + (d.focus ? 18 + chipH : 0);
-  let top = cy - blockH / 2;
-
-  ctx.fillStyle = t.text;
-  ctx.font = font(800, name.size);
-  drawLines(name.lines, tx, top + name.size * 0.9, nameLH);
-  top += name.lines.length * nameLH;
-
-  if (rf) {
-    top += 10;
-    ctx.fillStyle = t.muted;
-    ctx.font = font(400, rf.size);
-    drawLines(rf.lines, tx, top + rf.size * 0.95, roleLH);
-    top += rf.lines.length * roleLH;
-  }
-
-  if (d.focus) drawFocusChip(t, d.focus, tx, top + 18, 1, tw);
-
-  if (d.goal) drawQuote(t, d.goal, M, 770, W - M * 2, 200, 1);
-
-  drawFooter(d, t, W, H, M, M, 26, 50);
+  drawFooter(d, t, cx, 70, 950, W - 120, 100, 0.95);
 }
 
 function drawLandscape(d, t, W, H) {
-  const M = 60;
-  const s = 0.72;
+  ctx.fillStyle = t.bg;
+  ctx.fillRect(0, 0, W, H);
 
-  // Avatar column
-  const r = 135;
-  drawAvatar(t, d.fullName, M + r + 10, H / 2 - 10, r);
+  drawLoopArrow(W + 30, 300, 230, 0.58 * Math.PI, 1.4 * Math.PI, 42, t.loop, t.loopAlpha);
 
-  // Content column
-  const x = M + r * 2 + 70;
-  const w = W - x - M;
-  drawPill(t, CONFIG.program, x, 82, s, 'left');
-  drawBrand(t, W - M, 30, 96, 'right');
-
-  ctx.fillStyle = t.muted;
-  ctx.font = font(400, 28);
-  ctx.fillText(`${CONFIG.headlineIntro} the ${CONFIG.program}`, x, 158);
-
+  drawBand(t, W, 96, 76, 40, 'left');
+  // Headline in the band, right side
+  ctx.textAlign = 'right';
   ctx.fillStyle = t.text;
-  const name = fitText(d.fullName, 800, 58, 36, w, 1);
-  let y = drawLines(name.lines, x, 226, name.size);
+  ctx.font = font(900, 22);
+  withLetterSpacing(3, () => ctx.fillText(`${CONFIG.headlineIntro} the`.toUpperCase(), W - 44, 42));
+  ctx.font = font(900, 40);
+  ctx.fillText(CONFIG.program.toUpperCase(), W - 44, 80);
 
-  const role = roleLine(d);
-  if (role) {
-    ctx.fillStyle = t.muted;
-    const rf = fitText(role, 400, 28, 20, w, 1);
-    y = drawLines(rf.lines, x, y + 8, rf.size);
-  }
+  // Left column: avatar in its loop
+  const acx = 230, ay = 350, r = 112;
+  drawLoopArrow(acx, ay, r + 46, -0.2 * Math.PI, 1.55 * Math.PI, 18, t.loop, Math.min(1, t.loopAlpha + 0.25));
+  drawAvatar(t, d.fullName, acx, ay, r);
 
-  if (d.focus) y = drawFocusChip(t, d.focus, x, y + 4, 0.8, w);
-
-  if (d.goal) drawQuote(t, d.goal, x, y + 20, w, H - (y + 20) - 82, s);
-
-  drawFooter(d, t, W, H, M, x, 20, 40);
+  // Right column: centered text
+  const colX = 440, colW = W - colX - 50, cx = colX + colW / 2;
+  drawPersonBlock(d, t, cx, 136, colW, 0.78, 470);
+  drawFooter(d, t, cx, colX, 500, colW, 92, 0.78);
 }
 
 /* ---------- render ---------- */
@@ -421,12 +451,13 @@ function render() {
   ctx.textBaseline = 'alphabetic';
   ctx.textAlign = 'left';
 
-  drawBackground(t, W, H);
   if (d.format === 'landscape') drawLandscape(d, t, W, H);
   else drawSquare(d, t, W, H);
 
   updatePost(d);
-  $('download').disabled = !$('fullName').value.trim();
+  const ready = !!$('fullName').value.trim();
+  $('download').disabled = !ready;
+  $('copy-image').disabled = !ready;
 }
 
 /* ---------- LinkedIn post skeleton ----------
@@ -494,11 +525,12 @@ function buildSwatches() {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'swatch';
-    b.title = t.name;
     b.setAttribute('role', 'radio');
-    b.setAttribute('aria-label', t.name);
     b.setAttribute('aria-checked', String(t.id === state.themeId));
-    b.style.background = `linear-gradient(135deg, ${t.bg1} 50%, ${t.accent} 50%)`;
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    dot.style.background = `linear-gradient(135deg, ${t.swatch[0]} 55%, ${t.swatch[1]} 55%)`;
+    b.append(dot, t.name);
     b.addEventListener('click', () => {
       state.themeId = t.id;
       wrapEl.querySelectorAll('.swatch').forEach((s) => s.setAttribute('aria-checked', 'false'));
@@ -613,6 +645,31 @@ $('download').addEventListener('click', () => {
   }, 'image/png');
 });
 
+function showCopyStatus(msg) {
+  const el = $('copy-status');
+  el.textContent = msg;
+  clearTimeout(showCopyStatus.timer);
+  showCopyStatus.timer = setTimeout(() => (el.textContent = ''), 4000);
+}
+
+// Copy the card straight to the clipboard so it can be pasted into a LinkedIn post.
+$('copy-image').addEventListener('click', async () => {
+  const d = getData();
+  countEvent(`card-copied/${slugify(d.cohort || 'no-cohort')}/${d.format}/${state.themeId}`);
+  if (!navigator.clipboard || !window.ClipboardItem) {
+    showCopyStatus("Your browser can't copy images. Please use Download PNG instead.");
+    return;
+  }
+  try {
+    // Passing a promise keeps Safari happy (the clipboard write must start during the click)
+    const blob = new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    showCopyStatus('Card copied! Paste it into your LinkedIn post with Ctrl+V (or ⌘V on Mac).');
+  } catch {
+    showCopyStatus("Couldn't copy the image. Please use Download PNG instead.");
+  }
+});
+
 $('copy-post').addEventListener('click', async () => {
   const btn = $('copy-post');
   countEvent('post-copied');
@@ -638,9 +695,10 @@ $('copy-post').addEventListener('click', async () => {
   // Re-render once web fonts are ready so the canvas uses the brand fonts
   try {
     await Promise.all([
-      document.fonts.load(font(800, 40)),
+      document.fonts.load(font(900, 40)),
       document.fonts.load(font(700, 40)),
       document.fonts.load(font(400, 40)),
+      document.fonts.load(`italic 400 40px "${CONFIG.bodyFont}"`),
     ]);
     await document.fonts.ready;
   } catch { /* system font fallback is fine */ }

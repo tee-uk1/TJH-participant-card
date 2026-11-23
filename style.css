@@ -1,10 +1,13 @@
-/* General Job Hackers styling: white page, Lapis headings, Lapis-outlined
-   cards and Deep Saffron pill buttons, set in Lato.
+/* General Job Hackers styling: soft tinted backgrounds (no stark white),
+   Lapis headings, Lapis-outlined cards and Deep Saffron pill buttons, in Lato.
    Every color comes from the brand tonal maps (Lapis, Saffron, Sunglow, Green). */
 :root {
-  --bg: #ffffff;
-  --bg-alt: #f6f6fc;
-  --panel: #ffffff;
+  --bg: #f6f6fc;        /* lightest Lapis tint */
+  --bg-alt: #fff1e4;    /* light Saffron tint */
+  --hero: #ffe7d0;      /* Saffron tint */
+  --panel: #fffbf7;     /* lightest Saffron tint */
+  --field: #f6f6fc;
+  --on-saffron: #fffbf7;
   --text: #4b4b81;
   --muted: #62626a;
   --border: #d9d9f2;
@@ -26,7 +29,7 @@ body {
 }
 
 /* ---------- top bar (like the site nav) ---------- */
-.topbar { border-bottom: 1px solid var(--border); background: #fff; }
+.topbar { border-bottom: 1px solid var(--border); background: var(--bg); }
 .topbar-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -36,22 +39,59 @@ body {
   justify-content: space-between;
 }
 .brand { height: 60px; width: auto; display: block; }
+.brand-link { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+.tool-name {
+  font-weight: 700;
+  color: var(--lapis);
+  font-size: 16px;
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+}
 
 /* ---------- page header ---------- */
+.hero { background: var(--hero); border-bottom: 1px solid #ffd4a9; }
 .site-header {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 48px 24px 8px;
+  padding: 44px 24px 36px;
   text-align: center;
 }
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a95400; /* darkest readable Saffron tint */
+}
 .site-header h1 {
-  margin: 0 0 8px;
-  font-size: 32px;
-  font-weight: 700;
+  margin: 0 0 10px;
+  font-size: 40px;
+  font-weight: 900;
   color: var(--lapis);
-  line-height: 1.25;
+  line-height: 1.15;
 }
 .lede { margin: 0 auto; color: var(--text); max-width: 680px; font-size: 18px; }
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 22px auto 0;
+  display: flex;
+  justify-content: center;
+  gap: 12px 28px;
+  flex-wrap: wrap;
+  color: var(--lapis-dark);
+  font-weight: 700;
+}
+.steps li { display: flex; align-items: center; gap: 8px; }
+.steps .num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--lapis);
+  color: var(--on-saffron);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
 
 /* ---------- layout ---------- */
 .layout {
@@ -87,7 +127,7 @@ input[type="text"], textarea, select {
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--field);
   color: var(--lapis-dark);
   width: 100%;
 }
@@ -117,7 +157,9 @@ input[type="file"] { font-size: 14px; }
   padding: 0;
   box-shadow: 0 0 0 1px var(--border);
 }
-.swatch[aria-checked="true"] { border-color: var(--lapis); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--lapis); }
+.swatch { width: auto; height: auto; border-radius: 999px; padding: 6px 12px 6px 6px; display: inline-flex; align-items: center; gap: 8px; background: var(--field); font: inherit; font-size: 14px; color: var(--lapis-dark); }
+.swatch .dot { width: 22px; height: 22px; border-radius: 50%; display: inline-block; }
+.swatch[aria-checked="true"] { border-color: var(--lapis); box-shadow: 0 0 0 1px var(--lapis); font-weight: 700; }
 
 /* ---------- preview ---------- */
 .canvas-wrap {
@@ -135,7 +177,7 @@ canvas {
   box-shadow: 0 10px 30px rgba(31, 31, 94, 0.18);
 }
 
-.actions { display: flex; justify-content: center; gap: 12px; margin: 22px 0 8px; }
+.actions { display: flex; justify-content: center; gap: 12px; margin: 22px 0 8px; flex-wrap: wrap; }
 .btn {
   font: inherit;
   font-size: 20px;
@@ -145,8 +187,11 @@ canvas {
   padding: 10px 28px;
   cursor: pointer;
 }
-.btn.primary { background: var(--saffron); color: #fff; }
+.btn.primary { background: var(--saffron); color: var(--on-saffron); }
 .btn.primary:hover { background: var(--saffron-dark); }
+.btn.secondary { background: transparent; color: var(--lapis); box-shadow: inset 0 0 0 2px var(--lapis); }
+.btn.secondary:hover { background: var(--border); }
+.copy-status { text-align: center; font-size: 14px; font-weight: 700; color: var(--lapis); min-height: 21px; margin: 0; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .link-btn {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agile MBA – Participant Card | The Job Hackers</title>
+  <title>Agile MBA™ Participant Card Generator | The Job Hackers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -12,16 +12,25 @@
 <body>
   <nav class="topbar">
     <div class="topbar-inner">
-      <a href="https://www.thejobhackers.org/" aria-label="The Job Hackers home">
+      <a href="https://www.thejobhackers.org/" class="brand-link" aria-label="The Job Hackers home">
         <img class="brand" src="assets/logo-lapis.png" alt="The Job Hackers" />
+        <span class="tool-name">Participant Card Generator</span>
       </a>
     </div>
   </nav>
 
-  <header class="site-header">
-    <h1>Share that you're taking part in the Agile MBA&trade;</h1>
-    <p class="lede">Fill in your details, download your card, and share it on LinkedIn. Everything stays in your browser. Nothing is uploaded.</p>
-  </header>
+  <div class="hero">
+    <header class="site-header">
+      <p class="eyebrow">Agile MBA&trade; Participants</p>
+      <h1>Participant Card Generator</h1>
+      <p class="lede">Make a personalized card that shows you're taking part in the Agile MBA&trade;, ready to share on LinkedIn. Everything stays in your browser. Nothing is uploaded.</p>
+      <ol class="steps">
+        <li><span class="num">1</span>Add your details</li>
+        <li><span class="num">2</span>Pick a style</li>
+        <li><span class="num">3</span>Download or copy your card</li>
+      </ol>
+    </header>
+  </div>
 
   <main class="layout">
     <form id="card-form" class="panel" autocomplete="on" novalidate>
@@ -91,8 +100,10 @@
         <canvas id="card" width="1080" height="1080" aria-label="Preview of your participant card"></canvas>
       </div>
       <div class="actions">
-        <button type="button" id="download" class="btn primary">Download image</button>
+        <button type="button" id="download" class="btn primary">Download PNG</button>
+        <button type="button" id="copy-image" class="btn secondary">Copy image</button>
       </div>
+      <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
 
       <div class="post">
         <div class="post-head">

@@ -5,6 +5,7 @@ A small static web page where people who have enrolled in The Job Hackers' Agile
 - Everything runs in the browser. Nothing people type is uploaded or stored.
 - Square format (1080×1080) and landscape format (1200×627).
 - Photo upload with zoom. If there's no photo, the card shows initials.
+- Download the card as a PNG, or copy it to the clipboard and paste it straight into a LinkedIn post.
 - Generates a suggested LinkedIn post with a copy button.
 
 ## Run locally
@@ -20,11 +21,11 @@ Then open http://localhost:5173.
 Edit the `CONFIG` block at the top of `app.js`:
 
 - `logos`: logo variants in `assets/`. Each theme chooses `white` (dark backgrounds) or `lapis` (light backgrounds).
-- `themes`: two color themes from the brand palette (Lapis Lazuli `#333399`, Deep Saffron `#FF9933`). The first, "Website", is the default: white background, Lapis text and outlined cards, Deep Saffron highlights. The second is Lapis & Saffron on a dark background.
+- `themes`: two card themes built from the brand palette. **Saffron** (default) has a soft Saffron background, a light top band with the Lapis logo, and Lapis text. **Lapis** is the dark version with the white logo and Saffron highlights. Both use the same "iteration loop" arrows as a background motif, a loop around the photo, and a forward-pointing ribbon for the cohort and hashtags.
 - `headingFont` / `bodyFont`: Lato (the primary brand font). Poppins is loaded too if you want to switch the headings to it.
 - `cardHashtags`: hashtags on the image (`#AgileMBA #AlwaysAJobHacker`). `hashtags`: hashtags in the post.
 - `courseUrl`: course page linked at the end of the post.
-- `headlineIntro`, `quoteLabel`: wording on the card.
+- `headlineIntro`: the line above "AGILE MBA™" on the card.
 
 ## Form fields
 
@@ -53,7 +54,8 @@ The tool can count how often it's used, without collecting anything people type.
 
 It counts:
 - page visits (automatic)
-- `card-download/<cohort>/<format>/<theme>`, e.g. `card-download/q4-2026/square/website`
+- `card-download/<cohort>/<format>/<theme>`, e.g. `card-download/q4-2026/square/saffron`
+- `card-copied/<cohort>/<format>/<theme>` (when the image is copied instead of downloaded)
 - `post-copied`
 
 To turn it on, sign up at goatcounter.com, pick a site code (e.g. `tjh-agile-card`), and set `goatcounterCode: 'tjh-agile-card'` in `app.js`. While the code is empty, nothing is sent anywhere.
